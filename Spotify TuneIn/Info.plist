@@ -16,6 +16,10 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>spotify</string>
+  </array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

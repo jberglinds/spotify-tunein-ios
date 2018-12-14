@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3B8B3EE8C426C97D3C41DE04 /* Pods_Spotify_TuneIn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */; };
 		ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E121C39ECF00959708 /* AppDelegate.swift */; };
 		ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E321C39ECF00959708 /* ViewController.swift */; };
 		ABEA01E721C39ECF00959708 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABEA01E521C39ECF00959708 /* Main.storyboard */; };
@@ -15,6 +16,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spotify_TuneIn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8EF48321824137BD9F3DFB14 /* Pods-Spotify TuneIn.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spotify TuneIn.release.xcconfig"; path = "Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn.release.xcconfig"; sourceTree = "<group>"; };
 		ABEA01DE21C39ECF00959708 /* Spotify TuneIn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spotify TuneIn.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABEA01E121C39ECF00959708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ABEA01E321C39ECF00959708 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +25,7 @@
 		ABEA01E821C39ECF00959708 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ABEA01EB21C39ECF00959708 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ABEA01ED21C39ECF00959708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F460643574B8857D42840B8B /* Pods-Spotify TuneIn.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spotify TuneIn.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +33,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B8B3EE8C426C97D3C41DE04 /* Pods_Spotify_TuneIn.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2B535119217FC19EE4B69929 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8DBF66F64D9B21486021F182 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F460643574B8857D42840B8B /* Pods-Spotify TuneIn.debug.xcconfig */,
+				8EF48321824137BD9F3DFB14 /* Pods-Spotify TuneIn.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		ABEA01D521C39ECF00959708 = {
 			isa = PBXGroup;
 			children = (
 				ABEA01E021C39ECF00959708 /* Spotify TuneIn */,
 				ABEA01DF21C39ECF00959708 /* Products */,
+				8DBF66F64D9B21486021F182 /* Pods */,
+				2B535119217FC19EE4B69929 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,9 +95,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = ABEA01F021C39ECF00959708 /* Build configuration list for PBXNativeTarget "Spotify TuneIn" */;
 			buildPhases = (
+				F4F59F0FEB6F47A764248D3A /* [CP] Check Pods Manifest.lock */,
 				ABEA01DA21C39ECF00959708 /* Sources */,
 				ABEA01DB21C39ECF00959708 /* Frameworks */,
 				ABEA01DC21C39ECF00959708 /* Resources */,
+				F9F80B1F4F210FA23A0EABBB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -129,6 +155,47 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F4F59F0FEB6F47A764248D3A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Spotify TuneIn-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F9F80B1F4F210FA23A0EABBB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		ABEA01DA21C39ECF00959708 /* Sources */ = {
@@ -280,17 +347,37 @@
 		};
 		ABEA01F121C39ECF00959708 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F460643574B8857D42840B8B /* Pods-Spotify TuneIn.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RVSA2Z4HRJ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/SpotifyRemoteSDK",
+				);
 				INFOPLIST_FILE = "Spotify TuneIn/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"RxCocoa\"",
+					"-framework",
+					"\"RxSwift\"",
+					"-framework",
+					"\"SpotifyiOS\"",
+					"-framework",
+					"\"UIKit\"",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.berglind.Spotify-TuneIn";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Spotify-TuneIn-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -298,17 +385,37 @@
 		};
 		ABEA01F221C39ECF00959708 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8EF48321824137BD9F3DFB14 /* Pods-Spotify TuneIn.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RVSA2Z4HRJ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/SpotifyRemoteSDK",
+				);
 				INFOPLIST_FILE = "Spotify TuneIn/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"RxCocoa\"",
+					"-framework",
+					"\"RxSwift\"",
+					"-framework",
+					"\"SpotifyiOS\"",
+					"-framework",
+					"\"UIKit\"",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.berglind.Spotify-TuneIn";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Spotify-TuneIn-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
