@@ -10,11 +10,31 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate {
+  let SpotifyClientID = "92856ab901c743489c9bfde3b024a13e"
+  let SpotifyRedirectURL = URL(string: "spotify-tunein://spotify-login-callback")!
+
+  lazy var configuration = SPTConfiguration(
+    clientID: SpotifyClientID,
+    redirectURL: SpotifyRedirectURL
+  )
+
+  lazy var sessionManager: SPTSessionManager = {
+    if let tokenSwapURL = URL(string: "https://spotify-tunein-tokenswap.herokuapp.com/api/token"),
+      let tokenRefreshURL = URL(string: "https://spotify-tunein-tokenswap.herokuapp.com/api/refresh_token") {
+      self.configuration.tokenSwapURL = tokenSwapURL
+      self.configuration.tokenRefreshURL = tokenRefreshURL
+      self.configuration.playURI = ""
+    }
+    let manager = SPTSessionManager(configuration: self.configuration, delegate: self)
+    return manager
+  }()
 
   var window: UIWindow?
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
+    sessionManager.initiateSession(with: [.appRemoteControl], options: .default)
     return true
   }
 
@@ -40,12 +60,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
   }
 
-  func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+  func application(_ app: UIApplication, open url: URL,
+                   options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    self.sessionManager.application(app, open: url, options: options)
+    return true
+  }
 
+  func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+    print("success", session)
   }
 
   func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
+    print("fail", error)
+  }
 
+  func sessionManager(manager: SPTSessionManager, didRenew session: SPTSession) {
+    print("renewed", session)
   }
 }
 
