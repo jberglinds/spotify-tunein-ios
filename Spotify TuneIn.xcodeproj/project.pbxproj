@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3B8B3EE8C426C97D3C41DE04 /* Pods_Spotify_TuneIn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */; };
+		AB69804E21C9046200721AF0 /* SpotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyManager.swift */; };
 		ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E121C39ECF00959708 /* AppDelegate.swift */; };
 		ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E321C39ECF00959708 /* ViewController.swift */; };
 		ABEA01E721C39ECF00959708 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABEA01E521C39ECF00959708 /* Main.storyboard */; };
@@ -18,6 +19,7 @@
 /* Begin PBXFileReference section */
 		53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spotify_TuneIn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8EF48321824137BD9F3DFB14 /* Pods-Spotify TuneIn.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spotify TuneIn.release.xcconfig"; path = "Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn.release.xcconfig"; sourceTree = "<group>"; };
+		AB69804D21C9046200721AF0 /* SpotifyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyManager.swift; sourceTree = "<group>"; };
 		ABEA01DE21C39ECF00959708 /* Spotify TuneIn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spotify TuneIn.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABEA01E121C39ECF00959708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ABEA01E321C39ECF00959708 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 				ABEA01E821C39ECF00959708 /* Assets.xcassets */,
 				ABEA01EA21C39ECF00959708 /* LaunchScreen.storyboard */,
 				ABEA01ED21C39ECF00959708 /* Info.plist */,
+				AB69804D21C9046200721AF0 /* SpotifyManager.swift */,
 			);
 			path = "Spotify TuneIn";
 			sourceTree = "<group>";
@@ -182,6 +185,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
@@ -189,6 +193,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketIO.framework",
@@ -206,6 +211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB69804E21C9046200721AF0 /* SpotifyManager.swift in Sources */,
 				ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */,
 				ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */,
 			);
