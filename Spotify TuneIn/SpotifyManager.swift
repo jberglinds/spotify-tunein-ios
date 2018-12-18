@@ -16,7 +16,7 @@ class SpotifyManager:
   SPTAppRemoteDelegate,
   SPTAppRemotePlayerStateDelegate
 {
-  enum AuthencationResult {
+  enum Result {
     case success
     case error(Error)
   }
@@ -29,7 +29,8 @@ class SpotifyManager:
     redirectURL: SpotifyRedirectURL
   )
 
-  let authenticationSubject = PublishSubject<AuthencationResult>()
+  let authenticationSubject = PublishSubject<Result>()
+  let remoteConnectionSubject = PublishSubject<Result>()
   let playerUpdatesSubject = PublishSubject<SPTAppRemotePlayerState>()
   static var shared = SpotifyManager()
   var hasValidSession: Bool {
@@ -51,19 +52,63 @@ class SpotifyManager:
   }()
   lazy var appRemote: SPTAppRemote = {
     self.configuration.playURI = ""
-    let appRemote = SPTAppRemote(configuration: self.configuration, logLevel: .debug)
+    let appRemote = SPTAppRemote(configuration: self.configuration, logLevel: .none)
     appRemote.delegate = self
     return appRemote
   }()
 
-  func authenticate() -> Completable {
-    self.sessionManager.initiateSession(with: [.appRemoteControl], options: .default)
-    return authenticationSubject.take(1).single { result in
-      if case .error(let error) = result {
-        throw error
-      }
-      return true
-    }.ignoreElements()
+  private func authenticate() -> Completable {
+    return Completable.empty()
+      .do(onError: nil, onCompleted: { [weak self] in
+        self?.sessionManager.initiateSession(with: [.appRemoteControl], options: .default)
+      })
+      .andThen(self.authenticationSubject.take(1).single { result in
+        if case .error(let error) = result {
+          throw error
+        }
+        return true
+      }).ignoreElements()
+  }
+
+  private func connectToRemote() -> Completable {
+    return Completable.empty()
+      .do(onError: nil, onCompleted: { [weak self] in
+        if (self?.appRemote.isConnected ?? false) {
+          self?.remoteConnectionSubject.onNext(.success)
+        } else {
+          self?.appRemote.connect()
+        }
+      })
+      .andThen(self.remoteConnectionSubject.take(1).single { result in
+        if case .error(let error) = result {
+          throw error
+        }
+        return true
+      }).ignoreElements()
+  }
+
+  private func authenticateAndConnectToRemote() -> Completable {
+    return connectToRemote()
+      .catchError({ _ in
+        return self.authenticate()
+      })
+      .andThen(connectToRemote())
+  }
+
+  func connect() -> Observable<SPTAppRemotePlayerState> {
+    return authenticateAndConnectToRemote()
+      .andThen(Completable.create { completable in
+        // Register for player updates
+        self.appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
+          if let error = error {
+            completable(.error(error))
+          } else {
+            completable(.completed)
+          }
+        })
+        return Disposables.create()
+      })
+      .andThen(playerUpdatesSubject.asObservable())
   }
 
   func returnFromAuth(_ application: UIApplication, open url: URL,
@@ -74,9 +119,6 @@ class SpotifyManager:
   func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
     authenticationSubject.onNext(.success)
     appRemote.connectionParameters.accessToken = session.accessToken
-    DispatchQueue.main.async {
-      self.appRemote.connect()
-    }
   }
 
   func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
@@ -91,19 +133,21 @@ class SpotifyManager:
     playerUpdatesSubject.onNext(playerState)
   }
 
+  func getPlayerUpdates() -> Observable<SPTAppRemotePlayerState> {
+    return playerUpdatesSubject.asObservable()
+  }
+
   func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
+    remoteConnectionSubject.onNext(.success)
     self.appRemote.playerAPI?.delegate = self
-    self.appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
-      if let error = error {
-        debugPrint(error.localizedDescription)
-      }
-    })
   }
 
   func appRemote(_ appRemote: SPTAppRemote,
                  didFailConnectionAttemptWithError error: Error?) {
+    remoteConnectionSubject.onNext(.error(error ?? "Failed to connect to Spotify"))
   }
 
   func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
+    remoteConnectionSubject.onNext(.error(error ?? "Spotify disconnected"))
   }
 }
