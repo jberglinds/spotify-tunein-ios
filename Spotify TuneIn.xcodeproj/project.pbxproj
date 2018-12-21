@@ -9,22 +9,26 @@
 /* Begin PBXBuildFile section */
 		25EE408E1E2874FDC0D833D9 /* Pods_Spotify_TuneIn_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05EF5EC50A91322D6680C6A4 /* Pods_Spotify_TuneIn_Tests.framework */; };
 		3B8B3EE8C426C97D3C41DE04 /* Pods_Spotify_TuneIn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */; };
-		AB69804E21C9046200721AF0 /* SpotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyManager.swift */; };
+		AB69804E21C9046200721AF0 /* SpotifyRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyRemote.swift */; };
 		AB69805021C9349600721AF0 /* RadioAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804F21C9349600721AF0 /* RadioAPIClient.swift */; };
-		AB69805221CA4E7600721AF0 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805121CA4E7600721AF0 /* Result.swift */; };
 		AB69805421CA5F6A00721AF0 /* RadioCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805321CA5F6A00721AF0 /* RadioCoordinator.swift */; };
 		AB69805821CADFC300721AF0 /* String+Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805721CADFC300721AF0 /* String+Error.swift */; };
 		AB69805A21CAE2C500721AF0 /* SocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805921CAE2C500721AF0 /* SocketProvider.swift */; };
 		AB69805C21CAE95D00721AF0 /* SocketIOProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805B21CAE95D00721AF0 /* SocketIOProvider.swift */; };
 		AB736A3E21CBBE3100CD0218 /* RadioAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A3D21CBBE3100CD0218 /* RadioAPIClientTests.swift */; };
-		AB736A3F21CBBE6200CD0218 /* SpotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyManager.swift */; };
+		AB736A3F21CBBE6200CD0218 /* SpotifyRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyRemote.swift */; };
 		AB736A4021CBBE6200CD0218 /* RadioAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804F21C9349600721AF0 /* RadioAPIClient.swift */; };
-		AB736A4121CBBE6200CD0218 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805121CA4E7600721AF0 /* Result.swift */; };
 		AB736A4221CBBE6200CD0218 /* RadioCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805321CA5F6A00721AF0 /* RadioCoordinator.swift */; };
 		AB736A4321CBBE6200CD0218 /* String+Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805721CADFC300721AF0 /* String+Error.swift */; };
-		AB736A4421CBBE6200CD0218 /* SocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805921CAE2C500721AF0 /* SocketProvider.swift */; };
 		AB736A4521CBBE6200CD0218 /* SocketIOProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805B21CAE95D00721AF0 /* SocketIOProvider.swift */; };
 		AB736A4621CBBE6200CD0218 /* MockSocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805D21CAF50100721AF0 /* MockSocketProvider.swift */; };
+		AB736A4821CC24E300CD0218 /* MusicRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4721CC24E300CD0218 /* MusicRemote.swift */; };
+		AB736A4B21CC269500CD0218 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4A21CC269500CD0218 /* PlayerState.swift */; };
+		AB736A4E21CC280F00CD0218 /* MockMusicRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4D21CC280F00CD0218 /* MockMusicRemote.swift */; };
+		AB736A4F21CC286800CD0218 /* MusicRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4721CC24E300CD0218 /* MusicRemote.swift */; };
+		AB736A5021CC286C00CD0218 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4A21CC269500CD0218 /* PlayerState.swift */; };
+		AB736A5121CC30A800CD0218 /* SocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805921CAE2C500721AF0 /* SocketProvider.swift */; };
+		ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */; };
 		ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E121C39ECF00959708 /* AppDelegate.swift */; };
 		ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E321C39ECF00959708 /* ViewController.swift */; };
 		ABEA01E721C39ECF00959708 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABEA01E521C39ECF00959708 /* Main.storyboard */; };
@@ -46,9 +50,8 @@
 		05EF5EC50A91322D6680C6A4 /* Pods_Spotify_TuneIn_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spotify_TuneIn_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spotify_TuneIn.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8EF48321824137BD9F3DFB14 /* Pods-Spotify TuneIn.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spotify TuneIn.release.xcconfig"; path = "Pods/Target Support Files/Pods-Spotify TuneIn/Pods-Spotify TuneIn.release.xcconfig"; sourceTree = "<group>"; };
-		AB69804D21C9046200721AF0 /* SpotifyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyManager.swift; sourceTree = "<group>"; };
+		AB69804D21C9046200721AF0 /* SpotifyRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyRemote.swift; sourceTree = "<group>"; };
 		AB69804F21C9349600721AF0 /* RadioAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioAPIClient.swift; sourceTree = "<group>"; };
-		AB69805121CA4E7600721AF0 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		AB69805321CA5F6A00721AF0 /* RadioCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioCoordinator.swift; sourceTree = "<group>"; };
 		AB69805721CADFC300721AF0 /* String+Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Error.swift"; sourceTree = "<group>"; };
 		AB69805921CAE2C500721AF0 /* SocketProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketProvider.swift; sourceTree = "<group>"; };
@@ -57,6 +60,10 @@
 		AB736A3321CBBDDE00CD0218 /* Spotify TuneIn Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spotify TuneIn Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB736A3721CBBDDE00CD0218 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB736A3D21CBBE3100CD0218 /* RadioAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioAPIClientTests.swift; sourceTree = "<group>"; };
+		AB736A4721CC24E300CD0218 /* MusicRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRemote.swift; sourceTree = "<group>"; };
+		AB736A4A21CC269500CD0218 /* PlayerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerState.swift; sourceTree = "<group>"; };
+		AB736A4D21CC280F00CD0218 /* MockMusicRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMusicRemote.swift; sourceTree = "<group>"; };
+		ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioCoordinatorTests.swift; sourceTree = "<group>"; };
 		ABEA01DE21C39ECF00959708 /* Spotify TuneIn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spotify TuneIn.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABEA01E121C39ECF00959708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ABEA01E321C39ECF00959708 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +119,8 @@
 		AB736A3421CBBDDE00CD0218 /* Spotify TuneIn Tests */ = {
 			isa = PBXGroup;
 			children = (
+				ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */,
+				AB736A4D21CC280F00CD0218 /* MockMusicRemote.swift */,
 				AB69805D21CAF50100721AF0 /* MockSocketProvider.swift */,
 				AB736A3D21CBBE3100CD0218 /* RadioAPIClientTests.swift */,
 				AB736A3721CBBDDE00CD0218 /* Info.plist */,
@@ -142,18 +151,19 @@
 		ABEA01E021C39ECF00959708 /* Spotify TuneIn */ = {
 			isa = PBXGroup;
 			children = (
+				AB736A4A21CC269500CD0218 /* PlayerState.swift */,
+				AB736A4721CC24E300CD0218 /* MusicRemote.swift */,
+				AB69805921CAE2C500721AF0 /* SocketProvider.swift */,
 				ABEA01E121C39ECF00959708 /* AppDelegate.swift */,
 				ABEA01E321C39ECF00959708 /* ViewController.swift */,
 				ABEA01E521C39ECF00959708 /* Main.storyboard */,
 				ABEA01E821C39ECF00959708 /* Assets.xcassets */,
 				ABEA01EA21C39ECF00959708 /* LaunchScreen.storyboard */,
 				ABEA01ED21C39ECF00959708 /* Info.plist */,
-				AB69804D21C9046200721AF0 /* SpotifyManager.swift */,
+				AB69804D21C9046200721AF0 /* SpotifyRemote.swift */,
 				AB69804F21C9349600721AF0 /* RadioAPIClient.swift */,
-				AB69805121CA4E7600721AF0 /* Result.swift */,
 				AB69805321CA5F6A00721AF0 /* RadioCoordinator.swift */,
 				AB69805721CADFC300721AF0 /* String+Error.swift */,
-				AB69805921CAE2C500721AF0 /* SocketProvider.swift */,
 				AB69805B21CAE95D00721AF0 /* SocketIOProvider.swift */,
 			);
 			path = "Spotify TuneIn";
@@ -333,13 +343,16 @@
 			files = (
 				AB736A4021CBBE6200CD0218 /* RadioAPIClient.swift in Sources */,
 				AB736A4321CBBE6200CD0218 /* String+Error.swift in Sources */,
-				AB736A4421CBBE6200CD0218 /* SocketProvider.swift in Sources */,
+				AB736A5021CC286C00CD0218 /* PlayerState.swift in Sources */,
 				AB736A4621CBBE6200CD0218 /* MockSocketProvider.swift in Sources */,
-				AB736A3F21CBBE6200CD0218 /* SpotifyManager.swift in Sources */,
+				AB736A3F21CBBE6200CD0218 /* SpotifyRemote.swift in Sources */,
+				AB736A4E21CC280F00CD0218 /* MockMusicRemote.swift in Sources */,
+				ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */,
 				AB736A4221CBBE6200CD0218 /* RadioCoordinator.swift in Sources */,
 				AB736A4521CBBE6200CD0218 /* SocketIOProvider.swift in Sources */,
-				AB736A4121CBBE6200CD0218 /* Result.swift in Sources */,
 				AB736A3E21CBBE3100CD0218 /* RadioAPIClientTests.swift in Sources */,
+				AB736A4F21CC286800CD0218 /* MusicRemote.swift in Sources */,
+				AB736A5121CC30A800CD0218 /* SocketProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,15 +360,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB69804E21C9046200721AF0 /* SpotifyManager.swift in Sources */,
+				AB69804E21C9046200721AF0 /* SpotifyRemote.swift in Sources */,
 				AB69805821CADFC300721AF0 /* String+Error.swift in Sources */,
+				AB736A4B21CC269500CD0218 /* PlayerState.swift in Sources */,
 				AB69805C21CAE95D00721AF0 /* SocketIOProvider.swift in Sources */,
-				AB69805221CA4E7600721AF0 /* Result.swift in Sources */,
 				AB69805A21CAE2C500721AF0 /* SocketProvider.swift in Sources */,
 				ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */,
 				ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */,
 				AB69805421CA5F6A00721AF0 /* RadioCoordinator.swift in Sources */,
 				AB69805021C9349600721AF0 /* RadioAPIClient.swift in Sources */,
+				AB736A4821CC24E300CD0218 /* MusicRemote.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

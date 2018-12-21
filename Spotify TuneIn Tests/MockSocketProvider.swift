@@ -9,7 +9,7 @@
 import Foundation
 
 class MockAckEmitter: AckEmitter {
-  func with(_ items: Any...) {}
+  func with(_ items: [Any]) {}
 }
 
 class MockSocketProvider: SocketProvider {
@@ -61,13 +61,13 @@ class MockSocketProvider: SocketProvider {
     self.callbacks[event] = callback
   }
 
-  func emit(event: String, data: Any...) {
+  func emit(event: String, data: [Any]) {
     if connected {
       emittedEvents.append(event)
     }
   }
 
-  func emitWithAck(event: String, data: Any..., ackCallback: @escaping ([Any]) -> ()) {
+  func emitWithAck(event: String, data: [Any], ackCallback: @escaping ([Any]) -> ()) {
     if connected {
       emittedEvents.append(event)
     }

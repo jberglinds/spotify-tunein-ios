@@ -109,7 +109,6 @@ class RadioCoordinatorTests: XCTestCase {
     XCTAssertEqual(
       socket.emittedEvents,
       [RadioAPIClient.SocketEvent.startBroadcast,
-       RadioAPIClient.SocketEvent.endBroadcast,
        RadioAPIClient.SocketEvent.joinBroadcast].map({ $0.rawValue })
     )
   }
@@ -121,7 +120,6 @@ class RadioCoordinatorTests: XCTestCase {
     XCTAssertEqual(
       socket.emittedEvents,
       [RadioAPIClient.SocketEvent.joinBroadcast,
-       RadioAPIClient.SocketEvent.leaveBroadcast,
        RadioAPIClient.SocketEvent.startBroadcast].map({ $0.rawValue })
     )
   }

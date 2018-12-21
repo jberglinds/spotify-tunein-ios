@@ -14,13 +14,13 @@ enum ClientEvent {
 }
 
 protocol AckEmitter {
-  func with(_ items: Any...)
+  func with(_ items: [Any])
 }
 
 protocol SocketProvider {
   func connect()
   func on(clientEvent: ClientEvent, callback: @escaping ([Any], AckEmitter) -> ())
   func on(_ event: String, callback: @escaping ([Any], AckEmitter) -> ())
-  func emit(event: String, data: Any...)
-  func emitWithAck(event: String, data: Any..., ackCallback: @escaping ([Any]) -> ())
+  func emit(event: String, data: [Any])
+  func emitWithAck(event: String, data: [Any], ackCallback: @escaping ([Any]) -> ())
 }

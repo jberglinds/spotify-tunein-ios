@@ -11,11 +11,14 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
-  lazy var spotifyManager = SpotifyManager.shared
+  lazy var spotifyRemote = SpotifyRemote()
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
+    if ProcessInfo.processInfo.environment["XCInjectBundleInto"] != nil {
+      return false
+    }
     return true
   }
 
@@ -43,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ app: UIApplication, open url: URL,
                    options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    return spotifyManager.returnFromAuth(app, open: url, options: options)
+    return spotifyRemote.returnFromAuth(app, open: url, options: options)
   }
 }
 

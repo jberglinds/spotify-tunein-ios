@@ -43,11 +43,11 @@ class SocketIOProvider: SocketProvider {
     socket.on(event, callback: callback)
   }
 
-  func emit(event: String, data: Any...){
-    socket.emit(event, data)
+  func emit(event: String, data: [Any]){
+    socket.emit(event, with: data)
   }
 
-  func emitWithAck(event: String, data: Any..., ackCallback: @escaping ([Any]) -> ()) {
-    socket.emitWithAck(event, data).timingOut(after: 1.0, callback: ackCallback)
+  func emitWithAck(event: String, data: [Any], ackCallback: @escaping ([Any]) -> ()) {
+    socket.emitWithAck(event, with: data).timingOut(after: 1.0, callback: ackCallback)
   }
 }

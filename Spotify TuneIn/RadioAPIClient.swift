@@ -72,16 +72,12 @@ class RadioAPIClient {
   }
 
   func startBroadcasting(stationName: String) -> Completable {
-    return Completable.deferred({ [weak self] in
-      guard let self = self else { return Completable.empty() }
-      // End listening if doing that
-      return self.isListening ? self.leaveBroadcast() : Completable.empty()
-    }).andThen(socket
-      // Start broadcasting
+    return socket
       .emitWithAck(event: .startBroadcast, data: stationName)
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = true
-      }))
+        self?.isListening = false
+      })
   }
 
   func getBroadcasterEvents() -> Observable<BroadcasterEvent> {
@@ -102,16 +98,12 @@ class RadioAPIClient {
   }
 
   func joinBroadcast(stationName: String) -> Completable {
-    return Completable.deferred({ [weak self] in
-      guard let self = self else { return Completable.empty() }
-      // End broadcasting if doing that
-      return self.isBroadcasting ? self.endBroadcasting() : Completable.empty()
-    }).andThen(socket
-      // Join broadcast
+    return socket
       .emitWithAck(event: .joinBroadcast, data: stationName)
       .do(onCompleted: { [weak self] in
+        self?.isBroadcasting = false
         self?.isListening = true
-      }))
+      })
   }
 
   func getListenerEvents() -> Observable<ListenerEvent> {

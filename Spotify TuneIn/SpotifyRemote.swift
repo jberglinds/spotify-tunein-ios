@@ -57,7 +57,7 @@ class SpotifyRemote: NSObject, MusicRemote {
       guard let self = self else { return Completable.error("Error") }
       if self.appRemote.isConnected {
         // Skip authentication
-        self.connectionRelay.accept(.completed)
+        return Completable.empty()
       } else {
         self.appRemote.connect()
       }
@@ -101,7 +101,11 @@ class SpotifyRemote: NSObject, MusicRemote {
     return Observable.deferred({ [weak self] in
       guard let self = self else { return Observable.error("Error") }
       return self.subscribeToPlayerUpdates()
-        .andThen(self.playerUpdatesRelay.dematerialize().asObservable())
+        .andThen(self.playerUpdatesRelay
+          .dematerialize()
+          .asObservable()
+          .debounce(0.5, scheduler: MainScheduler.instance)
+      )
     })
   }
 
