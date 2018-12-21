@@ -9,6 +9,7 @@
 import Foundation
 import SocketIO
 import RxSwift
+import RxCocoa
 
 class RadioAPIClient {
   enum SocketEvent: String {
@@ -32,8 +33,8 @@ class RadioAPIClient {
 
   private var socket: SocketProvider
 
-  private var broadcasterStreams = [UUID: PublishSubject<BroadcasterEvent>]()
-  private var listenerStreams = [UUID: PublishSubject<ListenerEvent>]()
+  private var broadcasterRelay = PublishRelay<Event<BroadcasterEvent>>()
+  private var listenerRelay = PublishRelay<Event<ListenerEvent>>()
 
   private(set) var isBroadcasting = false
   private(set) var isListening = false
@@ -48,52 +49,47 @@ class RadioAPIClient {
     socket.on(clientEvent: .error) { [weak self] _, _ in
       self?.isBroadcasting = false
       self?.isListening = false
-      self?.listenerStreams.values.forEach({ $0.onError("Lost connection to server") })
-      self?.broadcasterStreams.values.forEach({ $0.onError("Lost connection to server") })
+      self?.listenerRelay.accept(.error("Lost connection to server"))
+      self?.broadcasterRelay.accept(.error("Lost connection to server"))
     }
 
     socket.on(SocketEvent.broadcastEnded.rawValue) { [weak self] data, _ in
-      self?.listenerStreams.values.forEach({ $0.onCompleted() })
+      self?.listenerRelay.accept(.completed)
       self?.isListening = false
     }
 
     socket.on(SocketEvent.playerStateUpdated.rawValue) { [weak self] data, _ in
       guard let first = data.first as? [String: Any] else { return }
       guard let state = PlayerState(data: first) else { return }
-      self?.listenerStreams.values.forEach({ $0.onNext(.playerStateChanged(state)) })
+      self?.listenerRelay.accept(.next(.playerStateChanged(state)))
     }
 
     socket.on(SocketEvent.listenerCountChanged.rawValue) { [weak self] data, _ in
-      self?.broadcasterStreams.values.forEach({
-        $0.onNext(.listenerCountChanged(newCount: 1))
-      })
+      self?.broadcasterRelay.accept(.next(.listenerCountChanged(newCount: 1)))
     }
 
     socket.connect()
   }
 
   func startBroadcasting(stationName: String) -> Completable {
-    return endBroadcasting()
-      .andThen(socket
-        .emitWithAck(event: .startBroadcast, data: stationName)
-        .do(onCompleted: { [weak self] in
-          self?.isBroadcasting = true
-        }))
+    return Completable.deferred({ [weak self] in
+      guard let self = self else { return Completable.empty() }
+      // End listening if doing that
+      return self.isListening ? self.leaveBroadcast() : Completable.empty()
+    }).andThen(socket
+      // Start broadcasting
+      .emitWithAck(event: .startBroadcast, data: stationName)
+      .do(onCompleted: { [weak self] in
+        self?.isBroadcasting = true
+      }))
   }
 
   func getBroadcasterEvents() -> Observable<BroadcasterEvent> {
-    let subject = PublishSubject<BroadcasterEvent>()
-    let uuid = UUID()
-    return Completable.create(subscribe: { [weak self] src in
-      if !(self?.isBroadcasting ?? false) {
-        src(.error("Not currently broadcasting"))
-      } else {
-        self?.broadcasterStreams[uuid] = subject
-        src(.completed)
-      }
-      return Disposables.create()
-    }).andThen(subject).do(onDispose: { [weak self] in
-      self?.broadcasterStreams.removeValue(forKey: uuid)
+    return Observable.deferred({ [weak self] in
+      guard let self = self else { return Observable.empty() }
+      return self.isBroadcasting
+        ? self.broadcasterRelay.dematerialize().asObservable()
+        : Observable.error("Not currently broadcasting")
     })
   }
 
@@ -101,32 +97,29 @@ class RadioAPIClient {
     return socket.emitWithAck(event: .endBroadcast)
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = false
-        self?.broadcasterStreams.values.forEach({ $0.onCompleted() })
+        self?.broadcasterRelay.accept(.completed)
       })
   }
 
   func joinBroadcast(stationName: String) -> Completable {
-    return endBroadcasting()
-      .andThen(socket
-        .emitWithAck(event: .joinBroadcast, data: stationName)
-        .do(onCompleted: { [weak self] in
-          self?.isListening = true
-        }))
+    return Completable.deferred({ [weak self] in
+      guard let self = self else { return Completable.empty() }
+      // End broadcasting if doing that
+      return self.isBroadcasting ? self.endBroadcasting() : Completable.empty()
+    }).andThen(socket
+      // Join broadcast
+      .emitWithAck(event: .joinBroadcast, data: stationName)
+      .do(onCompleted: { [weak self] in
+        self?.isListening = true
+      }))
   }
 
   func getListenerEvents() -> Observable<ListenerEvent> {
-    let subject = PublishSubject<ListenerEvent>()
-    let uuid = UUID()
-    return Completable.create(subscribe: { [weak self] src in
-      if !(self?.isListening ?? false) {
-        src(.error("Not currently listening"))
-      } else {
-        self?.listenerStreams[uuid] = subject
-        src(.completed)
-      }
-      return Disposables.create()
-    }).andThen(subject).do(onDispose: { [weak self] in
-      self?.listenerStreams.removeValue(forKey: uuid)
+    return Observable.deferred({ [weak self] in
+      guard let self = self else { return Observable.empty() }
+      return self.isListening
+        ? self.listenerRelay.dematerialize().asObservable()
+        : Observable.error("Not currently listening")
     })
   }
 
@@ -134,13 +127,13 @@ class RadioAPIClient {
     return socket.emitWithAck(event: .leaveBroadcast)
       .do(onCompleted: { [weak self] in
         self?.isListening = false
-        self?.listenerStreams.values.forEach({ $0.onCompleted() })
+        self?.listenerRelay.accept(.completed)
       })
   }
 
   func broadcastPlayerStateChange(newState: PlayerState) -> Completable {
     return Completable.create(subscribe: { [weak self] src in
-      if self?.isBroadcasting ?? true {
+      if self?.isBroadcasting ?? false {
         src(.completed)
       } else {
         src(.error("Not currently broadcasting"))
