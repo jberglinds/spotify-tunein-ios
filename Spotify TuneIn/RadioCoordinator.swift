@@ -51,6 +51,7 @@ class RadioCoordinator {
       .connect()
       .andThen(api.startBroadcasting(stationName: stationName))
       .do(onCompleted: { [weak self] in
+        BackgroundManager.shared.playSilence()
         self?.stateRelay.accept(State(isBroadcasting: true,
                                       isListening: false,
                                       stationName: stationName))
@@ -91,6 +92,7 @@ class RadioCoordinator {
           self?.stateRelay.accept(State(isBroadcasting: false,
                                         isListening: false,
                                         stationName: nil))
+          BackgroundManager.shared.stopSilence()
       })
     disposeBag.insert(playerUpdatesSubscription!)
   }
@@ -133,6 +135,7 @@ class RadioCoordinator {
       .connect()
       .andThen(api.joinBroadcast(stationName: stationName))
       .do(onCompleted: { [weak self] in
+        BackgroundManager.shared.playSilence()
         self?.stateRelay.accept(State(isBroadcasting: false,
                                       isListening: true,
                                       stationName: stationName))
@@ -166,6 +169,7 @@ class RadioCoordinator {
           self?.stateRelay.accept(State(isBroadcasting: false,
                                         isListening: false,
                                         stationName: nil))
+        BackgroundManager.shared.stopSilence()
       })
     disposeBag.insert(tuneInSubscription!)
   }
