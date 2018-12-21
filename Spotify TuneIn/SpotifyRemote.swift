@@ -40,6 +40,9 @@ class SpotifyRemote: NSObject, MusicRemote {
   private var connectionRelay = PublishRelay<Event<Void>>()
   private var playerUpdatesRelay = PublishRelay<Event<PlayerState>>()
 
+  private var currentState: PlayerState?
+  private var currentStateTime = CACurrentMediaTime()
+
   // MARK: - Authentication
   /// Tries to authenticate using the Spotify app
   private func authenticate() -> Completable {
@@ -110,18 +113,83 @@ class SpotifyRemote: NSObject, MusicRemote {
   }
 
   func updatePlayerToState(newState: PlayerState) -> Completable {
-    return Completable.create(subscribe: { [weak self] src in
-      // TODO
-      if let playerAPI = self?.appRemote.playerAPI {
+    return Completable.deferred({ [weak self] in
+      guard let self = self else { return Completable.error("Error") }
+      guard let playerAPI = self.appRemote.playerAPI else {
+        return Completable.error("Not connected to Spotify")
+      }
+      if let currentState = self.currentState {
         if newState.isPaused {
-          playerAPI.pause(nil)
+          if currentState.isPaused {
+            return Completable.empty()
+          } else {
+            return self.pause(player: playerAPI)
+          }
         } else {
-          playerAPI.play("", callback: nil)
+          if currentState.isPaused {
+            return self.play(trackURI: newState.trackURI, player: playerAPI)
+              .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+          } else {
+            if currentState.trackURI != newState.trackURI {
+              // New track
+              return self.play(trackURI: newState.trackURI, player: playerAPI)
+                .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+            } else {
+              // Same track
+              let millisSinceUpdate = (CACurrentMediaTime() - self.currentStateTime) * 1000.0
+              let shouldSeek = abs((currentState.playbackPosition + Int(millisSinceUpdate)) - newState.playbackPosition) > 5000
+              return shouldSeek
+                ? self.scrub(to: newState.playbackPosition, player: playerAPI)
+                : Completable.empty()
+            }
+          }
         }
-        src(.completed)
       } else {
-        // Not connected to Spotify
-        src(.error("Not connected to Spotify"))
+        // No current state
+        if newState.isPaused {
+          return self.pause(player: playerAPI)
+        } else {
+          return self.play(trackURI: newState.trackURI, player: playerAPI)
+            .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+        }
+      }
+    })
+  }
+
+  private func play(trackURI: String, player: SPTAppRemotePlayerAPI) -> Completable {
+    return Completable.create(subscribe: { src in
+      player.play(trackURI) { result, error in
+        if let error = error {
+          src(.error(error))
+        } else {
+          src(.completed)
+        }
+      }
+      return Disposables.create()
+    })
+  }
+
+  private func scrub(to position: Int, player: SPTAppRemotePlayerAPI) -> Completable {
+    return Completable.create(subscribe: { src in
+      player.seek(toPosition: position) { result, error in
+        if let error = error {
+          src(.error(error))
+        } else {
+          src(.completed)
+        }
+      }
+      return Disposables.create()
+    })
+  }
+
+  private func pause(player: SPTAppRemotePlayerAPI) -> Completable {
+    return Completable.create(subscribe: { src in
+      player.pause() { result, error in
+        if let error = error {
+          src(.error(error))
+        } else {
+          src(.completed)
+        }
       }
       return Disposables.create()
     })
@@ -136,7 +204,8 @@ class SpotifyRemote: NSObject, MusicRemote {
 
 // MARK: - Spotify SDK Session Manager Delegate
 extension SpotifyRemote: SPTSessionManagerDelegate {
-  internal func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+  internal func sessionManager(manager: SPTSessionManager,
+                               didInitiate session: SPTSession) {
     appRemote.connectionParameters.accessToken = session.accessToken
     authenticationRelay.accept(.completed)
   }
@@ -162,7 +231,8 @@ extension SpotifyRemote: SPTAppRemoteDelegate {
     connectionRelay.accept(.error(error ?? "Failed to connect to Spotify"))
   }
 
-  internal func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
+  internal func appRemote(_ appRemote: SPTAppRemote,
+                          didDisconnectWithError error: Error?) {
     playerUpdatesRelay.accept(.error(error ?? "Spotify disconnected"))
   }
 }
@@ -170,6 +240,8 @@ extension SpotifyRemote: SPTAppRemoteDelegate {
 // MARK: - Spotify SDK App Remote Player State Delegate
 extension SpotifyRemote: SPTAppRemotePlayerStateDelegate {
   internal func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+    currentState = playerState.state
+    currentStateTime = CACurrentMediaTime();
     playerUpdatesRelay.accept(.next(playerState.state))
   }
 }
