@@ -31,6 +31,7 @@
 		ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */; };
 		ABCC1B1321CD53B200E7C578 /* BackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1221CD53B200E7C578 /* BackgroundManager.swift */; };
 		ABCC1B1521CD552000E7C578 /* silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ABCC1B1421CD552000E7C578 /* silence.mp3 */; };
+		ABCC1B1921CFACB900E7C578 /* RoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1821CFACB900E7C578 /* RoundedButton.swift */; };
 		ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E121C39ECF00959708 /* AppDelegate.swift */; };
 		ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEA01E321C39ECF00959708 /* ViewController.swift */; };
 		ABEA01E721C39ECF00959708 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABEA01E521C39ECF00959708 /* Main.storyboard */; };
@@ -68,6 +69,7 @@
 		ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioCoordinatorTests.swift; sourceTree = "<group>"; };
 		ABCC1B1221CD53B200E7C578 /* BackgroundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundManager.swift; sourceTree = "<group>"; };
 		ABCC1B1421CD552000E7C578 /* silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = silence.mp3; sourceTree = SOURCE_ROOT; };
+		ABCC1B1821CFACB900E7C578 /* RoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedButton.swift; sourceTree = "<group>"; };
 		ABEA01DE21C39ECF00959708 /* Spotify TuneIn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spotify TuneIn.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABEA01E121C39ECF00959708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ABEA01E321C39ECF00959708 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -132,6 +134,14 @@
 			path = "Spotify TuneIn Tests";
 			sourceTree = "<group>";
 		};
+		ABCC1B1721CFAC9E00E7C578 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				ABCC1B1821CFACB900E7C578 /* RoundedButton.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		ABEA01D521C39ECF00959708 = {
 			isa = PBXGroup;
 			children = (
@@ -155,6 +165,7 @@
 		ABEA01E021C39ECF00959708 /* Spotify TuneIn */ = {
 			isa = PBXGroup;
 			children = (
+				ABCC1B1721CFAC9E00E7C578 /* Views */,
 				ABCC1B1421CD552000E7C578 /* silence.mp3 */,
 				AB736A4A21CC269500CD0218 /* PlayerState.swift */,
 				AB736A4721CC24E300CD0218 /* MusicRemote.swift */,
@@ -379,6 +390,7 @@
 				ABCC1B1321CD53B200E7C578 /* BackgroundManager.swift in Sources */,
 				AB69805A21CAE2C500721AF0 /* SocketProvider.swift in Sources */,
 				ABEA01E421C39ECF00959708 /* ViewController.swift in Sources */,
+				ABCC1B1921CFACB900E7C578 /* RoundedButton.swift in Sources */,
 				ABEA01E221C39ECF00959708 /* AppDelegate.swift in Sources */,
 				AB69805421CA5F6A00721AF0 /* RadioCoordinator.swift in Sources */,
 				AB69805021C9349600721AF0 /* RadioAPIClient.swift in Sources */,

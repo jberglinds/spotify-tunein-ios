@@ -34,6 +34,9 @@ class SpotifyRemote: NSObject, MusicRemote {
     appRemote.delegate = self
     return appRemote
   }()
+  var isConnected: Bool {
+    return appRemote.isConnected
+  }
 
   // MARK: - Properties
   private var authenticationRelay = PublishRelay<Event<Void>>()
@@ -41,7 +44,7 @@ class SpotifyRemote: NSObject, MusicRemote {
   private var playerUpdatesRelay = PublishRelay<Event<PlayerState>>()
 
   private var currentState: PlayerState?
-  private var currentStateTime = CACurrentMediaTime()
+  private var currentAlbumArt: SPTAppRemoteImageRepresentable?
 
   // MARK: - Authentication
   /// Tries to authenticate using the Spotify app
@@ -97,6 +100,27 @@ class SpotifyRemote: NSObject, MusicRemote {
     }
   }
 
+  func getCurrentAlbumArtwork(size: CGSize) -> Single<UIImage> {
+    return Single.create(subscribe: { [weak self] src in
+      if let imageAPI = self?.appRemote.imageAPI {
+        if let albumArt = self?.currentAlbumArt {
+          imageAPI.fetchImage(forItem: albumArt, with: size) { result, error in
+            if let error = error {
+              src(.error(error))
+            } else {
+              src(.success(result as! UIImage))
+            }
+          }
+        } else {
+          src(.success(UIImage()))
+        }
+      } else {
+        src(.error("Not connected to Spotify"))
+      }
+      return Disposables.create()
+    })
+  }
+
   /// Gets updates to the Spotify player.
   /// Will fail if not connected to remote before calling.
   /// Fails if remote disconnects
@@ -136,7 +160,7 @@ class SpotifyRemote: NSObject, MusicRemote {
                 .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
             } else {
               // Same track
-              let millisSinceUpdate = (CACurrentMediaTime() - self.currentStateTime) * 1000.0
+              let millisSinceUpdate = Int(CACurrentMediaTime() * 1000) - currentState.timestamp
               let shouldSeek = abs((currentState.playbackPosition + Int(millisSinceUpdate)) - newState.playbackPosition) > 5000
               return shouldSeek
                 ? self.scrub(to: newState.playbackPosition, player: playerAPI)
@@ -241,7 +265,7 @@ extension SpotifyRemote: SPTAppRemoteDelegate {
 extension SpotifyRemote: SPTAppRemotePlayerStateDelegate {
   internal func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
     currentState = playerState.state
-    currentStateTime = CACurrentMediaTime();
+    currentAlbumArt = playerState.track
     playerUpdatesRelay.accept(.next(playerState.state))
   }
 }
@@ -249,7 +273,10 @@ extension SpotifyRemote: SPTAppRemotePlayerStateDelegate {
 // MARK: -
 extension SPTAppRemotePlayerState {
   var state: PlayerState {
-    return PlayerState(isPaused: self.isPaused,
+    return PlayerState(timestamp: Int(CACurrentMediaTime() * 1000),
+                       isPaused: self.isPaused,
+                       trackName: self.track.name,
+                       trackArtist: self.track.artist.name,
                        trackURI: self.track.uri,
                        playbackPosition: self.playbackPosition)
   }

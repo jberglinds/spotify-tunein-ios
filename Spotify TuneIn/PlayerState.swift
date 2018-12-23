@@ -1,4 +1,3 @@
-//
 //  PlayerState.swift
 //  Spotify TuneIn
 //
@@ -9,7 +8,10 @@
 import Foundation
 
 struct PlayerState: Codable {
+  var timestamp: Int
   var isPaused: Bool
+  var trackName: String?
+  var trackArtist: String?
   var trackURI: String
   var playbackPosition: Int
 }

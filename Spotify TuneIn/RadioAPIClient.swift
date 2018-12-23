@@ -159,17 +159,22 @@ extension SocketProvider {
 extension PlayerState {
   init?(data: [String: Any]) {
     guard
+      let timestamp = data["timestamp"] as? Int,
       let isPaused = data["isPaused"] as? Bool,
       let playbackPosition = data["playbackPosition"] as? Int,
       let trackURI = data["trackURI"] as? String
     else { return nil }
+    self.timestamp = timestamp
     self.isPaused = isPaused
     self.playbackPosition = playbackPosition
     self.trackURI = trackURI
+    self.trackName = nil
+    self.trackArtist = nil
   }
 
   func socketRepresentation() -> SocketData {
     return [
+      "timestamp": self.timestamp,
       "isPaused": self.isPaused,
       "playbackPosition": self.playbackPosition,
       "trackURI": self.trackURI
