@@ -25,9 +25,11 @@ class BackgroundManager {
       player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
 
       guard let player = player else { return }
-      player.numberOfLoops = -1
-      player.play()
-      print("Starting to play silence")
+      if !player.isPlaying {
+        player.numberOfLoops = -1
+        player.play()
+        print("Starting to play silence")
+      }
     } catch let error {
       print(error.localizedDescription)
     }
