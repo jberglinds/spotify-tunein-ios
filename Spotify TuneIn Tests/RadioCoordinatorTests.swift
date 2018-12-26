@@ -23,7 +23,12 @@ class RadioCoordinatorTests: XCTestCase {
     coordinator = RadioCoordinator(api: api, remote: remote)
   }
 
-  var examplePlayerState = PlayerState(isPaused: true, trackURI: "", playbackPosition: 1)
+  var examplePlayerState = PlayerState(timestamp: 0,
+                                       isPaused: true,
+                                       trackName: nil,
+                                       trackArtist: nil,
+                                       trackURI: "",
+                                       playbackPosition: 1)
 
   func startBroadcast() throws {
     _ = try coordinator.startBroadcast(stationName: "station")
@@ -63,25 +68,25 @@ class RadioCoordinatorTests: XCTestCase {
     try endBroadcast()
     XCTAssertEqual(
       socket.emittedEvents,
-      [RadioAPIClient.SocketEvent.startBroadcast,
-       RadioAPIClient.SocketEvent.updatePlayerState,
-       RadioAPIClient.SocketEvent.updatePlayerState,
-       RadioAPIClient.SocketEvent.endBroadcast].map({ $0.rawValue })
+      [RadioAPIClient.OutgoingEvent.startBroadcast,
+       RadioAPIClient.OutgoingEvent.updatePlayerState,
+       RadioAPIClient.OutgoingEvent.updatePlayerState,
+       RadioAPIClient.OutgoingEvent.endBroadcast].map({ $0.rawValue })
     )
   }
 
   func testTuneInHappyPath() throws {
     failOnError()
     try joinBroadcast()
-    socket.mockIncomingEvent(RadioAPIClient.SocketEvent.playerStateUpdated.rawValue,
+    socket.mockIncomingEvent(RadioAPIClient.IncomingEvent.playerStateUpdated.rawValue,
                              data: examplePlayerState.socketRepresentation())
-    socket.mockIncomingEvent(RadioAPIClient.SocketEvent.playerStateUpdated.rawValue,
+    socket.mockIncomingEvent(RadioAPIClient.IncomingEvent.playerStateUpdated.rawValue,
                              data: examplePlayerState.socketRepresentation())
     try leaveBroadcast()
     XCTAssertEqual(
       socket.emittedEvents,
-      [RadioAPIClient.SocketEvent.joinBroadcast,
-       RadioAPIClient.SocketEvent.leaveBroadcast].map({ $0.rawValue })
+      [RadioAPIClient.OutgoingEvent.joinBroadcast,
+       RadioAPIClient.OutgoingEvent.leaveBroadcast].map({ $0.rawValue })
     )
     XCTAssertEqual(
       remote.playerStateUpdates,
@@ -108,8 +113,8 @@ class RadioCoordinatorTests: XCTestCase {
     try joinBroadcast()
     XCTAssertEqual(
       socket.emittedEvents,
-      [RadioAPIClient.SocketEvent.startBroadcast,
-       RadioAPIClient.SocketEvent.joinBroadcast].map({ $0.rawValue })
+      [RadioAPIClient.OutgoingEvent.startBroadcast,
+       RadioAPIClient.OutgoingEvent.joinBroadcast].map({ $0.rawValue })
     )
   }
 
@@ -119,8 +124,8 @@ class RadioCoordinatorTests: XCTestCase {
     try startBroadcast()
     XCTAssertEqual(
       socket.emittedEvents,
-      [RadioAPIClient.SocketEvent.joinBroadcast,
-       RadioAPIClient.SocketEvent.startBroadcast].map({ $0.rawValue })
+      [RadioAPIClient.OutgoingEvent.joinBroadcast,
+       RadioAPIClient.OutgoingEvent.startBroadcast].map({ $0.rawValue })
     )
   }
 

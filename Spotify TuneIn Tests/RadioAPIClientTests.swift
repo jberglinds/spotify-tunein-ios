@@ -20,6 +20,13 @@ class RadioAPIClientTests: XCTestCase {
     apiClient = RadioAPIClient(socket: socketProvider)
   }
 
+  var examplePlayerState = PlayerState(timestamp: 0,
+                                       isPaused: true,
+                                       trackName: nil,
+                                       trackArtist: nil,
+                                       trackURI: "",
+                                       playbackPosition: 1)
+
   func startBroadcasting() throws {
     _ = try apiClient.startBroadcasting(stationName: "station")
       .toBlocking(timeout: 1.0)
@@ -65,7 +72,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event not emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event != RadioAPIClient.SocketEvent.startBroadcast.rawValue)
+    XCTAssert(event != RadioAPIClient.OutgoingEvent.startBroadcast.rawValue)
   }
 
   func testStartBroadcasting() throws {
@@ -74,7 +81,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event == RadioAPIClient.SocketEvent.startBroadcast.rawValue)
+    XCTAssert(event == RadioAPIClient.OutgoingEvent.startBroadcast.rawValue)
   }
 
   // MARK: - endBroadcasting
@@ -92,7 +99,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event == RadioAPIClient.SocketEvent.endBroadcast.rawValue)
+    XCTAssert(event == RadioAPIClient.OutgoingEvent.endBroadcast.rawValue)
   }
 
   // MARK: - getBroadcasterEvents
@@ -118,7 +125,7 @@ class RadioAPIClientTests: XCTestCase {
       }).disposed(by: disposeBag)
     // Send event which should appear in subscribe
     socketProvider.mockIncomingEvent(
-      RadioAPIClient.SocketEvent.listenerCountChanged.rawValue,
+      RadioAPIClient.IncomingEvent.listenerCountChanged.rawValue,
       data: 1
     )
     wait(for: [async], timeout: 1.0)
@@ -155,9 +162,8 @@ class RadioAPIClientTests: XCTestCase {
   func testBroadcastPlayerStateDoesErrorsWhenNotBroadcasting() {
     XCTAssert(apiClient.isBroadcasting == false)
     XCTAssertThrowsError(
-      try apiClient.broadcastPlayerStateChange(
-        newState: PlayerState(isPaused: true, trackURI: "", playbackPosition: 1)
-        ).toBlocking(timeout: 1.0).last()
+      try apiClient.broadcastPlayerStateChange(newState: examplePlayerState)
+        .toBlocking(timeout: 1.0).last()
     ) { error in
       // Assure not timeout error
       XCTAssertNil(error as? RxError)
@@ -167,12 +173,11 @@ class RadioAPIClientTests: XCTestCase {
   func testBroadcastPlayerStateWhenBroadcastingEmitsUpdate() throws {
     _ = try startBroadcasting()
     XCTAssert(apiClient.isBroadcasting == true)
-    _ = try apiClient.broadcastPlayerStateChange(
-      newState: PlayerState(isPaused: true, trackURI: "", playbackPosition: 1)
-    ).toBlocking(timeout: 1.0).last()
+    _ = try apiClient.broadcastPlayerStateChange(newState: examplePlayerState)
+      .toBlocking(timeout: 1.0).last()
     let event = socketProvider.emittedEvents.last
     XCTAssertNotNil(event)
-    XCTAssert(event! == RadioAPIClient.SocketEvent.updatePlayerState.rawValue)
+    XCTAssert(event! == RadioAPIClient.OutgoingEvent.updatePlayerState.rawValue)
   }
 
   // MARK: - joinBroadcast
@@ -189,7 +194,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event not emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event != RadioAPIClient.SocketEvent.joinBroadcast.rawValue)
+    XCTAssert(event != RadioAPIClient.OutgoingEvent.joinBroadcast.rawValue)
   }
 
   func testJoinBroadcast() throws {
@@ -198,7 +203,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event == RadioAPIClient.SocketEvent.joinBroadcast.rawValue)
+    XCTAssert(event == RadioAPIClient.OutgoingEvent.joinBroadcast.rawValue)
   }
 
   // MARK: - leaveBroadcast
@@ -216,7 +221,7 @@ class RadioAPIClientTests: XCTestCase {
 
     // Event emitted
     let event = socketProvider.emittedEvents.last
-    XCTAssert(event == RadioAPIClient.SocketEvent.leaveBroadcast.rawValue)
+    XCTAssert(event == RadioAPIClient.OutgoingEvent.leaveBroadcast.rawValue)
   }
 
   // MARK: - getListenerEvents
@@ -242,10 +247,8 @@ class RadioAPIClientTests: XCTestCase {
       }).disposed(by: disposeBag)
     // Send event which should appear in subscribe
     socketProvider.mockIncomingEvent(
-      RadioAPIClient.SocketEvent.playerStateUpdated.rawValue,
-      data: PlayerState(isPaused: true,
-                        trackURI: "",
-                        playbackPosition: 1).socketRepresentation()
+      RadioAPIClient.IncomingEvent.playerStateUpdated.rawValue,
+      data: examplePlayerState.socketRepresentation()
     )
     wait(for: [async], timeout: 1.0)
   }
@@ -286,7 +289,7 @@ class RadioAPIClientTests: XCTestCase {
       .subscribe(onCompleted: {
         async.fulfill()
       }).disposed(by: disposeBag)
-    socketProvider.mockIncomingEvent(RadioAPIClient.SocketEvent.broadcastEnded.rawValue)
+    socketProvider.mockIncomingEvent(RadioAPIClient.IncomingEvent.broadcastEnded.rawValue)
 
     XCTAssert(apiClient.isListening == false)
     wait(for: [async], timeout: 1.0)

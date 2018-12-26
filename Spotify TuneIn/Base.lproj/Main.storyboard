@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="S9P-vu-Y7H">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Radio-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Spotify_TuneIn" customModuleProvider="target" sceneMemberID="viewController">
@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="25" translatesAutoresizingMaskIntoConstraints="NO" id="cBh-iq-Ryl">
-                                <rect key="frame" x="16" y="60" width="343" height="702"/>
+                                <rect key="frame" x="16" y="60" width="343" height="653"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="25" translatesAutoresizingMaskIntoConstraints="NO" id="7bz-Vw-Gs5">
                                         <rect key="frame" x="0.0" y="0.0" width="343" height="309"/>
@@ -78,7 +78,7 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="25" translatesAutoresizingMaskIntoConstraints="NO" id="whh-jb-RAC">
-                                        <rect key="frame" x="0.0" y="334" width="343" height="368"/>
+                                        <rect key="frame" x="0.0" y="334" width="343" height="319"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="5lz-5C-Mpx">
                                                 <rect key="frame" x="0.0" y="0.0" width="343" height="51.333333333333336"/>
@@ -98,11 +98,11 @@
                                                 </subviews>
                                             </stackView>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aHh-yB-Fdy">
-                                                <rect key="frame" x="0.0" y="76.3333333333333" width="343" height="195.66666666666663"/>
+                                                <rect key="frame" x="0.0" y="76.3333333333333" width="343" height="146.66666666666663"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </view>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="E5L-Rb-VVV">
-                                                <rect key="frame" x="0.0" y="297" width="343" height="71"/>
+                                                <rect key="frame" x="0.0" y="248" width="343" height="71"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NOT CONNECTED - START BY CONNECTING TO SPOTIFY" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CcH-8x-IO4">
                                                         <rect key="frame" x="0.0" y="0.0" width="343" height="13"/>
@@ -151,6 +151,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Radio" image="Radio" id="4HZ-km-FVj"/>
                     <connections>
                         <outlet property="actionButton" destination="mWG-lr-5as" id="JRo-1E-Gki"/>
                         <outlet property="actionButtonDescriptionLabel" destination="CcH-8x-IO4" id="Qd6-BX-rtg"/>
@@ -168,9 +169,69 @@
             </objects>
             <point key="canvasLocation" x="53.600000000000001" y="22.906403940886701"/>
         </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="rX1-Ob-EkJ">
+            <objects>
+                <tabBarController id="S9P-vu-Y7H" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" id="Cb2-vP-Ghy">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="MfX-Nm-uNi"/>
+                        <segue destination="mjO-eJ-twh" kind="relationship" relationship="viewControllers" id="XYG-t3-fQw"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bdS-wT-imV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="473" y="-675"/>
+        </scene>
+        <!--Discover-->
+        <scene sceneID="ioy-qZ-wYN">
+            <objects>
+                <viewController id="mjO-eJ-twh" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="HOd-iG-h24">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="mutedStandard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ee6-Ob-hMz">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="729"/>
+                            </mapView>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mRB-aS-aaK">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="2OZ-nF-AqM">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <blurEffect style="light"/>
+                            </visualEffectView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="top" secondItem="Ee6-Ob-hMz" secondAttribute="top" id="EP9-5E-eAX"/>
+                            <constraint firstAttribute="trailing" secondItem="mRB-aS-aaK" secondAttribute="trailing" id="I5Y-Qf-1wD"/>
+                            <constraint firstItem="Xve-pL-Cl6" firstAttribute="bottom" secondItem="Ee6-Ob-hMz" secondAttribute="bottom" id="OxZ-Cy-dSB"/>
+                            <constraint firstItem="Xve-pL-Cl6" firstAttribute="top" secondItem="mRB-aS-aaK" secondAttribute="bottom" id="Prq-op-YFu"/>
+                            <constraint firstItem="mRB-aS-aaK" firstAttribute="leading" secondItem="HOd-iG-h24" secondAttribute="leading" id="Rhu-io-hIy"/>
+                            <constraint firstItem="Ee6-Ob-hMz" firstAttribute="leading" secondItem="HOd-iG-h24" secondAttribute="leading" id="Sus-We-PnW"/>
+                            <constraint firstAttribute="trailing" secondItem="Ee6-Ob-hMz" secondAttribute="trailing" id="TeR-hf-kFn"/>
+                            <constraint firstAttribute="top" secondItem="mRB-aS-aaK" secondAttribute="top" id="dQG-g8-dpd"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Xve-pL-Cl6"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Discover" image="Globe" id="VU8-bR-DCG"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TtL-KT-Coh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="853.60000000000002" y="23.645320197044335"/>
+        </scene>
     </scenes>
     <resources>
         <image name="BeamLeft" width="48" height="200"/>
         <image name="BeamRight" width="48" height="200"/>
+        <image name="Globe" width="25" height="26"/>
+        <image name="Radio" width="25" height="26"/>
     </resources>
+    <color key="tintColor" red="0.34125930069999999" green="0.71633595230000002" blue="0.3763947487" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
 </document>

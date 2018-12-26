@@ -28,6 +28,7 @@
 		AB736A4F21CC286800CD0218 /* MusicRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4721CC24E300CD0218 /* MusicRemote.swift */; };
 		AB736A5021CC286C00CD0218 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB736A4A21CC269500CD0218 /* PlayerState.swift */; };
 		AB736A5121CC30A800CD0218 /* SocketProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805921CAE2C500721AF0 /* SocketProvider.swift */; };
+		AB84C2FA21D3A28C004F8E1F /* BackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1221CD53B200E7C578 /* BackgroundManager.swift */; };
 		ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1021CD075200E7C578 /* RadioCoordinatorTests.swift */; };
 		ABCC1B1321CD53B200E7C578 /* BackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCC1B1221CD53B200E7C578 /* BackgroundManager.swift */; };
 		ABCC1B1521CD552000E7C578 /* silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ABCC1B1421CD552000E7C578 /* silence.mp3 */; };
@@ -371,6 +372,7 @@
 				AB736A3F21CBBE6200CD0218 /* SpotifyRemote.swift in Sources */,
 				AB736A4E21CC280F00CD0218 /* MockMusicRemote.swift in Sources */,
 				ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */,
+				AB84C2FA21D3A28C004F8E1F /* BackgroundManager.swift in Sources */,
 				AB736A4221CBBE6200CD0218 /* RadioCoordinator.swift in Sources */,
 				AB736A4521CBBE6200CD0218 /* SocketIOProvider.swift in Sources */,
 				AB736A3E21CBBE3100CD0218 /* RadioAPIClientTests.swift in Sources */,

@@ -12,15 +12,18 @@ import RxSwift
 import RxCocoa
 
 class RadioAPIClient {
-  enum SocketEvent: String {
+  enum IncomingEvent: String {
+    case playerStateUpdated = "player-state-updated"
+    case broadcastEnded = "broadcast-ended"
+    case listenerCountChanged = "listener-count-changed"
+  }
+
+  enum OutgoingEvent: String {
     case startBroadcast = "start-broadcast"
     case endBroadcast = "end-broadcast"
     case updatePlayerState = "update-player-state"
     case joinBroadcast = "join-broadcast"
     case leaveBroadcast = "leave-broadcast"
-    case playerStateUpdated = "player-state-updated"
-    case broadcastEnded = "broadcast-ended"
-    case listenerCountChanged = "listener-count-changed"
   }
 
   enum ListenerEvent {
@@ -53,18 +56,18 @@ class RadioAPIClient {
       self?.broadcasterRelay.accept(.error("Lost connection to server"))
     }
 
-    socket.on(SocketEvent.broadcastEnded.rawValue) { [weak self] data, _ in
+    socket.on(IncomingEvent.broadcastEnded.rawValue) { [weak self] data, _ in
       self?.listenerRelay.accept(.completed)
       self?.isListening = false
     }
 
-    socket.on(SocketEvent.playerStateUpdated.rawValue) { [weak self] data, _ in
+    socket.on(IncomingEvent.playerStateUpdated.rawValue) { [weak self] data, _ in
       guard let first = data.first as? [String: Any] else { return }
       guard let state = PlayerState(data: first) else { return }
       self?.listenerRelay.accept(.next(.playerStateChanged(state)))
     }
 
-    socket.on(SocketEvent.listenerCountChanged.rawValue) { [weak self] data, _ in
+    socket.on(IncomingEvent.listenerCountChanged.rawValue) { [weak self] data, _ in
       self?.broadcasterRelay.accept(.next(.listenerCountChanged(newCount: 1)))
     }
 
@@ -138,7 +141,7 @@ class RadioAPIClient {
 }
 
 extension SocketProvider {
-  func emitWithAck(event: RadioAPIClient.SocketEvent, data: Any...) -> Completable {
+  func emitWithAck(event: RadioAPIClient.OutgoingEvent, data: Any...) -> Completable {
     return Completable.create { completable in
       self.emitWithAck(event: event.rawValue, data: data) { data in
         // FIXME: Proper error handling

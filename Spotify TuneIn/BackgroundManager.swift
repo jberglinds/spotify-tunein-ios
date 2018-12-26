@@ -16,10 +16,16 @@ class BackgroundManager {
   private init() {}
 
   func playSilence() {
-    guard let url = Bundle.main.url(forResource: "silence", withExtension: "mp3") else { return }
+    // Bail out if unit test
+    guard ProcessInfo.processInfo.environment["XCInjectBundleInto"] == nil else { return }
+
+    guard let url = Bundle.main.url(forResource: "silence", withExtension: "mp3") else {
+      return
+    }
 
     do {
-      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: .mixWithOthers)
+      try AVAudioSession.sharedInstance()
+        .setCategory(.playback, mode: .default, options: .mixWithOthers)
       try AVAudioSession.sharedInstance().setActive(true)
 
       player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
