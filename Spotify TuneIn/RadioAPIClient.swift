@@ -74,9 +74,9 @@ class RadioAPIClient {
     socket.connect()
   }
 
-  func startBroadcasting(stationName: String) -> Completable {
+  func startBroadcasting(station: RadioStation) -> Completable {
     return socket
-      .emitWithAck(event: .startBroadcast, data: stationName)
+      .emitWithAck(event: .startBroadcast, data: station.socketRepresentation())
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = true
         self?.isListening = false
@@ -182,5 +182,20 @@ extension PlayerState {
       "playbackPosition": self.playbackPosition,
       "trackURI": self.trackURI
     ]
+  }
+}
+
+extension RadioStation: SocketData {
+  func socketRepresentation() -> SocketData {
+    var data: [String: Any] = [
+      "name": self.name
+    ]
+    if let coordinate = self.coordinate {
+      data["coordinate"] = [
+        "lat": coordinate.lat,
+        "lng": coordinate.lng
+      ]
+    }
+    return data
   }
 }

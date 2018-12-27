@@ -7,7 +7,9 @@
 //
 
 import UIKit
+import CoreLocation
 import RxSwift
+import RxCocoa
 
 class ViewController: UIViewController {
   struct State {
@@ -37,15 +39,15 @@ class ViewController: UIViewController {
     return appDelegate.spotifyRemote
   }()
   private lazy var radioCoordinator: RadioCoordinator = {
-    let socket = SocketIOProvider(url: "http://192.168.0.99:3000", namespace: "/radio")
-    let api = RadioAPIClient(socket: socket)
-    return RadioCoordinator(api: api, remote: remote)
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    return appDelegate.radioCoordinator
   }()
   private var playerUpdatesSubscription: Disposable?
   private let disposeBag = DisposeBag()
   private var state = State() {
     didSet { updateUI() }
   }
+  private var locationService = LocationService()
 
   // MARK: - Lifecycle
   override func viewDidLoad() {
@@ -146,7 +148,13 @@ class ViewController: UIViewController {
       { [weak self] action in
         guard let self = self else { return }
         guard let text = field?.text, !text.isEmpty else { return }
-        self.radioCoordinator.startBroadcast(stationName: text)
+        self.locationService.getLocation()
+          .timeout(3.0, scheduler: MainScheduler.instance)
+          .map({ RadioStation(name: text, coordinate: $0.coord )})
+          .catchErrorJustReturn(RadioStation(name: text, coordinate: nil))
+          .flatMapCompletable({ station in
+            return self.radioCoordinator.startBroadcast(station: station)
+          })
           .subscribe(onError: { error in
             if let str = error as? String {
               self.showErrorAlert(error: str)
@@ -192,6 +200,12 @@ extension CGSize {
     let scale = UIScreen.main.scale
     return CGSize(width: self.width * scale,
                   height: self.height * scale)
+  }
+}
+
+extension CLLocation {
+  var coord: Coordinate {
+    return Coordinate(lat: self.coordinate.latitude, lng: self.coordinate.longitude)
   }
 }
 

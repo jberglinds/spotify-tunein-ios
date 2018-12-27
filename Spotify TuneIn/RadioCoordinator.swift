@@ -28,7 +28,9 @@ class RadioCoordinator {
   private var remote: MusicRemote
   private let disposeBag = DisposeBag()
 
-  private let stateRelay = PublishRelay<State>()
+  private let stateRelay = BehaviorRelay<State>(
+    value: State(isBroadcasting: false, isListening: false, stationName: nil)
+  )
   var state: Observable<State> {
     return stateRelay.asObservable()
   }
@@ -46,15 +48,15 @@ class RadioCoordinator {
   private var broadcasterSubscription: Disposable?
   private var tuneInSubscription: Disposable?
 
-  func startBroadcast(stationName: String) -> Completable {
+  func startBroadcast(station: RadioStation) -> Completable {
     return remote
       .connect()
-      .andThen(api.startBroadcasting(stationName: stationName))
+      .andThen(api.startBroadcasting(station: station))
       .do(onCompleted: { [weak self] in
         BackgroundManager.shared.playSilence()
         self?.stateRelay.accept(State(isBroadcasting: true,
                                       isListening: false,
-                                      stationName: stationName))
+                                      stationName: station.name))
         self?.startBroadcastingPlayerUpdates()
         self?.startMonitoringBroadcasterUpdates()
       })

@@ -83,7 +83,7 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="5lz-5C-Mpx">
                                                 <rect key="frame" x="0.0" y="0.0" width="343" height="51.333333333333336"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ho Ho Ho" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oy1-ta-0ee">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ho Ho Ho" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oy1-ta-0ee">
                                                         <rect key="frame" x="0.0" y="0.0" width="343" height="23.333333333333332"/>
                                                         <fontDescription key="fontDescription" name="DINAlternate-Bold" family="DIN Alternate" pointSize="20"/>
                                                         <color key="textColor" red="0.91933731025478338" green="0.91489606721007422" blue="0.92377855329949243" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -177,6 +177,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="selectedImageTintColor" red="0.34125930069999999" green="0.71633595230000002" blue="0.3763947487" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                     </tabBar>
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="MfX-Nm-uNi"/>
@@ -190,13 +191,16 @@
         <!--Discover-->
         <scene sceneID="ioy-qZ-wYN">
             <objects>
-                <viewController id="mjO-eJ-twh" sceneMemberID="viewController">
+                <viewController id="mjO-eJ-twh" customClass="DiscoverViewController" customModule="Spotify_TuneIn" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="HOd-iG-h24">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="mutedStandard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ee6-Ob-hMz">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="729"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="showsNightMode" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </mapView>
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mRB-aS-aaK">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -204,14 +208,14 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
-                                <blurEffect style="light"/>
+                                <blurEffect style="dark"/>
                             </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="top" secondItem="Ee6-Ob-hMz" secondAttribute="top" id="EP9-5E-eAX"/>
                             <constraint firstAttribute="trailing" secondItem="mRB-aS-aaK" secondAttribute="trailing" id="I5Y-Qf-1wD"/>
-                            <constraint firstItem="Xve-pL-Cl6" firstAttribute="bottom" secondItem="Ee6-Ob-hMz" secondAttribute="bottom" id="OxZ-Cy-dSB"/>
+                            <constraint firstAttribute="bottom" secondItem="Ee6-Ob-hMz" secondAttribute="bottom" id="OxZ-Cy-dSB"/>
                             <constraint firstItem="Xve-pL-Cl6" firstAttribute="top" secondItem="mRB-aS-aaK" secondAttribute="bottom" id="Prq-op-YFu"/>
                             <constraint firstItem="mRB-aS-aaK" firstAttribute="leading" secondItem="HOd-iG-h24" secondAttribute="leading" id="Rhu-io-hIy"/>
                             <constraint firstItem="Ee6-Ob-hMz" firstAttribute="leading" secondItem="HOd-iG-h24" secondAttribute="leading" id="Sus-We-PnW"/>
@@ -221,6 +225,9 @@
                         <viewLayoutGuide key="safeArea" id="Xve-pL-Cl6"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Discover" image="Globe" id="VU8-bR-DCG"/>
+                    <connections>
+                        <outlet property="mapView" destination="Ee6-Ob-hMz" id="mRV-gP-gBV"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TtL-KT-Coh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

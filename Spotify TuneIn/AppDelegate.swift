@@ -12,6 +12,11 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   lazy var spotifyRemote = SpotifyRemote()
+  lazy var radioCoordinator: RadioCoordinator = {
+    let socket = SocketIOProvider(url: "http://192.168.0.99:3000", namespace: "/radio")
+    let api = RadioAPIClient(socket: socket)
+    return RadioCoordinator(api: api, remote: spotifyRemote)
+  }()
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
