@@ -63,6 +63,7 @@ class SpotifyRemote: NSObject, MusicRemote {
       guard let self = self else { return Completable.error("Error") }
       if self.appRemote.isConnected {
         // Skip authentication
+        self.authenticationRelay.accept(.completed)
         return Completable.empty()
       } else {
         self.appRemote.connect()

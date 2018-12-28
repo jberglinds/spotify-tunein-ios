@@ -50,10 +50,11 @@ class RadioAPIClient {
     }
 
     socket.on(clientEvent: .error) { [weak self] _, _ in
-      self?.isBroadcasting = false
-      self?.isListening = false
-      self?.listenerRelay.accept(.error("Lost connection to server"))
-      self?.broadcasterRelay.accept(.error("Lost connection to server"))
+      self?.handleDisconnect()
+    }
+
+    socket.on(clientEvent: .disconnect) { [weak self] _, _ in
+      self?.handleDisconnect()
     }
 
     socket.on(IncomingEvent.broadcastEnded.rawValue) { [weak self] data, _ in
@@ -72,6 +73,13 @@ class RadioAPIClient {
     }
 
     socket.connect()
+  }
+
+  private func handleDisconnect() {
+    self.isBroadcasting = false
+    self.isListening = false
+    self.listenerRelay.accept(.error("Lost connection to server"))
+    self.broadcasterRelay.accept(.error("Lost connection to server"))
   }
 
   func startBroadcasting(station: RadioStation) -> Completable {

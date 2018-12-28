@@ -11,6 +11,7 @@ import Foundation
 enum ClientEvent {
   case connect
   case error
+  case disconnect
 }
 
 protocol AckEmitter {
