@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		25EE408E1E2874FDC0D833D9 /* Pods_Spotify_TuneIn_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05EF5EC50A91322D6680C6A4 /* Pods_Spotify_TuneIn_Tests.framework */; };
 		3B8B3EE8C426C97D3C41DE04 /* Pods_Spotify_TuneIn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53D0643F8DED354CDB001CF1 /* Pods_Spotify_TuneIn.framework */; };
+		AB4D57E121D6B30900782A93 /* RadioStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB84C2FC21D3D6B9004F8E1F /* RadioStation.swift */; };
 		AB69804E21C9046200721AF0 /* SpotifyRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804D21C9046200721AF0 /* SpotifyRemote.swift */; };
 		AB69805021C9349600721AF0 /* RadioAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69804F21C9349600721AF0 /* RadioAPIClient.swift */; };
 		AB69805421CA5F6A00721AF0 /* RadioCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB69805321CA5F6A00721AF0 /* RadioCoordinator.swift */; };
@@ -382,6 +383,7 @@
 				AB736A4E21CC280F00CD0218 /* MockMusicRemote.swift in Sources */,
 				ABCC1B1121CD075200E7C578 /* RadioCoordinatorTests.swift in Sources */,
 				AB84C2FA21D3A28C004F8E1F /* BackgroundManager.swift in Sources */,
+				AB4D57E121D6B30900782A93 /* RadioStation.swift in Sources */,
 				AB736A4221CBBE6200CD0218 /* RadioCoordinator.swift in Sources */,
 				AB736A4521CBBE6200CD0218 /* SocketIOProvider.swift in Sources */,
 				AB736A3E21CBBE3100CD0218 /* RadioAPIClientTests.swift in Sources */,

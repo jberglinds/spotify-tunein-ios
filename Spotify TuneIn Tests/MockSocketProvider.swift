@@ -15,12 +15,13 @@ class MockAckEmitter: AckEmitter {
 class MockSocketProvider: SocketProvider {
   private var clientCallbacks = [ClientEvent: ([Any], AckEmitter) -> ()]()
   private var callbacks = [String: ([Any], AckEmitter) -> ()]()
-  private var ackCallbacks = [String: ([Any]) -> ()]()
+
+  private var ackResponderData = [String: [Any]]()
 
   var emittedEvents = [String]()
 
   var connected = false
-  lazy var ackResponder = {
+  lazy var defaultAckResponder = {
     return self.connected ? [] : ["NO ACK"]
   }
 
@@ -36,11 +37,8 @@ class MockSocketProvider: SocketProvider {
     }
   }
 
-  func mockIncomingAck(for event: String, data: Any...) {
-    if let ackCallback = ackCallbacks[event] {
-      ackCallback(data)
-      ackCallbacks[event] = nil
-    }
+  func mockAckResponderData(for event: String, data: Any...) {
+    ackResponderData[event] = data
   }
 
   func connect() {
@@ -70,7 +68,11 @@ class MockSocketProvider: SocketProvider {
   func emitWithAck(event: String, data: [Any], ackCallback: @escaping ([Any]) -> ()) {
     if connected {
       emittedEvents.append(event)
+      if let ackData = ackResponderData[event] {
+        ackCallback(ackData)
+        return
+      }
     }
-    ackCallback(ackResponder())
+    ackCallback(defaultAckResponder())
   }
 }

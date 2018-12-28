@@ -136,14 +136,19 @@ class RadioCoordinator {
     return remote
       .connect()
       .andThen(api.joinBroadcast(stationName: stationName))
-      .do(onCompleted: { [weak self] in
+      .do(onSuccess: { [weak self] playerState in
+        guard let self = self else { return }
         BackgroundManager.shared.playSilence()
-        self?.stateRelay.accept(State(isBroadcasting: false,
+        self.stateRelay.accept(State(isBroadcasting: false,
                                       isListening: true,
                                       stationName: stationName))
-        self?.startUpdatingPlayerFromBroadcast()
-        self?.startMonitoringPlayerChanges()
+        self.remote.updatePlayerToState(newState: playerState)
+          .subscribe()
+          .disposed(by: self.disposeBag)
+        self.startUpdatingPlayerFromBroadcast()
+        self.startMonitoringPlayerChanges()
       })
+      .asCompletable()
   }
 
   /// Starts subscribing to player updates from the api and forwards them to the remote.

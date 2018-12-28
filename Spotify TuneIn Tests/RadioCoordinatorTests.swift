@@ -31,7 +31,7 @@ class RadioCoordinatorTests: XCTestCase {
                                        playbackPosition: 1)
 
   func startBroadcast() throws {
-    _ = try coordinator.startBroadcast(stationName: "station")
+    _ = try coordinator.startBroadcast(station: RadioStation(name: "station", coordinate: nil))
       .toBlocking(timeout: 1.0)
       .last()
   }
@@ -43,6 +43,10 @@ class RadioCoordinatorTests: XCTestCase {
   }
 
   func joinBroadcast() throws {
+    socket.mockAckResponderData(
+      for: RadioAPIClient.OutgoingEvent.joinBroadcast.rawValue,
+      data: examplePlayerState.socketRepresentation()
+    )
     _ = try coordinator.joinBroadcast(stationName: "station")
       .toBlocking(timeout: 1.0)
       .last()
@@ -91,6 +95,7 @@ class RadioCoordinatorTests: XCTestCase {
     XCTAssertEqual(
       remote.playerStateUpdates,
       [examplePlayerState,
+       examplePlayerState,
        examplePlayerState]
     )
   }

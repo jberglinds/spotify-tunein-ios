@@ -62,8 +62,8 @@ class RadioAPIClient {
     }
 
     socket.on(IncomingEvent.playerStateUpdated.rawValue) { [weak self] data, _ in
-      guard let first = data.first as? [String: Any] else { return }
-      guard let state = PlayerState(data: first) else { return }
+      guard let first = data.first  else { return }
+      guard let state = PlayerState(from: first) else { return }
       self?.listenerRelay.accept(.next(.playerStateChanged(state)))
     }
 
@@ -76,7 +76,7 @@ class RadioAPIClient {
 
   func startBroadcasting(station: RadioStation) -> Completable {
     return socket
-      .emitWithAck(event: .startBroadcast, data: station.socketRepresentation())
+      .emitWithVoidAck(event: .startBroadcast, data: station)
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = true
         self?.isListening = false
@@ -93,17 +93,24 @@ class RadioAPIClient {
   }
 
   func endBroadcasting() -> Completable {
-    return socket.emitWithAck(event: .endBroadcast)
+    return socket.emitWithVoidAck(event: .endBroadcast)
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = false
         self?.broadcasterRelay.accept(.completed)
       })
   }
 
-  func joinBroadcast(stationName: String) -> Completable {
+  func joinBroadcast(stationName: String) -> Single<PlayerState> {
     return socket
       .emitWithAck(event: .joinBroadcast, data: stationName)
-      .do(onCompleted: { [weak self] in
+      .map({ value in
+        if let state = PlayerState(from: value) {
+          return state
+        } else {
+          throw "Invalid payload"
+        }
+      })
+      .do(onSuccess: { [weak self] _ in
         self?.isBroadcasting = false
         self?.isListening = true
       })
@@ -119,7 +126,7 @@ class RadioAPIClient {
   }
 
   func leaveBroadcast() -> Completable {
-    return socket.emitWithAck(event: .leaveBroadcast)
+    return socket.emitWithVoidAck(event: .leaveBroadcast)
       .do(onCompleted: { [weak self] in
         self?.isListening = false
         self?.listenerRelay.accept(.completed)
@@ -135,37 +142,55 @@ class RadioAPIClient {
       }
       return Disposables.create()
     }).andThen(
-      socket.emitWithAck(event: .updatePlayerState, data: newState.socketRepresentation())
+      socket.emitWithVoidAck(event: .updatePlayerState, data: newState)
     )
   }
 }
 
 extension SocketProvider {
-  func emitWithAck(event: RadioAPIClient.OutgoingEvent, data: Any...) -> Completable {
-    return Completable.create { completable in
-      self.emitWithAck(event: event.rawValue, data: data) { data in
-        // FIXME: Proper error handling
-        if let error = data.first as? String {
-          if error == "NO ACK" {
-            completable(.error("No response from server"))
+  func emitWithVoidAck(event: RadioAPIClient.OutgoingEvent, data: SocketData...)
+    -> Completable {
+      let maybe = emitWithAck(event: event, data: data)
+      return maybe.asObservable().ignoreElements()
+  }
+
+  func emitWithAck(event: RadioAPIClient.OutgoingEvent, data: SocketData...)
+    -> Single<Any> {
+      let maybe: Maybe<Any> = emitWithAck(event: event, data: data)
+      return maybe.asObservable().asSingle()
+  }
+
+  private func emitWithAck(event: RadioAPIClient.OutgoingEvent, data: [SocketData])
+    -> Maybe<Any> {
+      return Maybe.create { src in
+        self.emitWithAck(event: event.rawValue, data: data) { data in
+          if let first = data.first {
+            if let error = first as? String {
+              if error == "NO ACK" {
+                src(.error("No response from server"))
+              } else {
+                src(.error(error))
+              }
+            } else {
+              src(.success(first))
+            }
           } else {
-            completable(.error(error))
+            src(.completed)
           }
         }
-        completable(.completed)
+        return Disposables.create()
       }
-      return Disposables.create {}
-    }
   }
 }
 
-extension PlayerState {
-  init?(data: [String: Any]) {
+extension PlayerState: SocketData {
+  init?(from: Any) {
     guard
-      let timestamp = data["timestamp"] as? Int,
-      let isPaused = data["isPaused"] as? Bool,
-      let playbackPosition = data["playbackPosition"] as? Int,
-      let trackURI = data["trackURI"] as? String
+      let dict = from as? [String: Any],
+      let timestamp = dict["timestamp"] as? Int,
+      let isPaused = dict["isPaused"] as? Bool,
+      let playbackPosition = dict["playbackPosition"] as? Int,
+      let trackURI = dict["trackURI"] as? String
     else { return nil }
     self.timestamp = timestamp
     self.isPaused = isPaused

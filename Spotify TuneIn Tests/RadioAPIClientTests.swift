@@ -28,7 +28,7 @@ class RadioAPIClientTests: XCTestCase {
                                        playbackPosition: 1)
 
   func startBroadcasting() throws {
-    _ = try apiClient.startBroadcasting(stationName: "station")
+    _ = try apiClient.startBroadcasting(station: RadioStation(name: "station", coordinate: nil))
       .toBlocking(timeout: 1.0)
       .last()
   }
@@ -40,6 +40,10 @@ class RadioAPIClientTests: XCTestCase {
   }
 
   func joinBroadcast() throws {
+    socketProvider.mockAckResponderData(
+      for: RadioAPIClient.OutgoingEvent.joinBroadcast.rawValue,
+      data: examplePlayerState.socketRepresentation()
+    )
     _ = try apiClient.joinBroadcast(stationName: "station")
       .toBlocking(timeout: 1.0)
       .last()
@@ -62,7 +66,7 @@ class RadioAPIClientTests: XCTestCase {
   func testStartBroadcastingWithoutConnectionFails() throws {
     socketProvider.disconnectWithError()
     XCTAssertThrowsError(
-      try apiClient.startBroadcasting(stationName: "station")
+      try apiClient.startBroadcasting(station: RadioStation(name: "station", coordinate: nil))
         .toBlocking(timeout: 1.0)
         .last()) { error in
           // Assure not timeout error
