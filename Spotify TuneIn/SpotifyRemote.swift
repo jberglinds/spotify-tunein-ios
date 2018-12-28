@@ -143,6 +143,8 @@ class SpotifyRemote: NSObject, MusicRemote {
       guard let playerAPI = self.appRemote.playerAPI else {
         return Completable.error("Not connected to Spotify")
       }
+      let scrubPosition =
+        newState.playbackPosition + ((Int(CACurrentMediaTime() * 1000)) - newState.timestamp)
       if let currentState = self.currentState {
         if newState.isPaused {
           if currentState.isPaused {
@@ -153,19 +155,15 @@ class SpotifyRemote: NSObject, MusicRemote {
         } else {
           if currentState.isPaused {
             return self.play(trackURI: newState.trackURI, player: playerAPI)
-              .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+              .andThen(self.scrub(to: scrubPosition, player: playerAPI))
           } else {
             if currentState.trackURI != newState.trackURI {
               // New track
               return self.play(trackURI: newState.trackURI, player: playerAPI)
-                .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+                .andThen(self.scrub(to: scrubPosition, player: playerAPI))
             } else {
               // Same track
-              let millisSinceUpdate = Int(CACurrentMediaTime() * 1000) - currentState.timestamp
-              let shouldSeek = abs((currentState.playbackPosition + Int(millisSinceUpdate)) - newState.playbackPosition) > 5000
-              return shouldSeek
-                ? self.scrub(to: newState.playbackPosition, player: playerAPI)
-                : Completable.empty()
+              return self.scrub(to: scrubPosition, player: playerAPI)
             }
           }
         }
@@ -175,7 +173,7 @@ class SpotifyRemote: NSObject, MusicRemote {
           return self.pause(player: playerAPI)
         } else {
           return self.play(trackURI: newState.trackURI, player: playerAPI)
-            .andThen(self.scrub(to: newState.playbackPosition, player: playerAPI))
+            .andThen(self.scrub(to: scrubPosition, player: playerAPI))
         }
       }
     })
