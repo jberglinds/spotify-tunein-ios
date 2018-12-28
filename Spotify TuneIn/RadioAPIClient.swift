@@ -76,7 +76,7 @@ class RadioAPIClient {
 
   func startBroadcasting(station: RadioStation) -> Completable {
     return socket
-      .emitWithVoidAck(event: .startBroadcast, data: station)
+      .emitWithVoidAck(event: .startBroadcast, data: station.socketRepresentation())
       .do(onCompleted: { [weak self] in
         self?.isBroadcasting = true
         self?.isListening = false
@@ -142,7 +142,8 @@ class RadioAPIClient {
       }
       return Disposables.create()
     }).andThen(
-      socket.emitWithVoidAck(event: .updatePlayerState, data: newState)
+      socket.emitWithVoidAck(event: .updatePlayerState,
+                             data: newState.socketRepresentation())
     )
   }
 }
