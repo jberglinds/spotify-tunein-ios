@@ -9,7 +9,6 @@
 import UIKit
 import MapKit
 import RxSwift
-import RxBlocking
 
 class DiscoverViewController: UIViewController {
   // MARK: - Outlets
@@ -21,56 +20,77 @@ class DiscoverViewController: UIViewController {
     return appDelegate.radioCoordinator
   }()
   var disposeBag = DisposeBag()
-  var radioStations = [RadioStation]() {
-    didSet {
-      let radioState = try? radioCoordinator.state.take(1).toBlocking().single()
-      let annotations: [MKPointAnnotation] = radioStations
-        .filter({ (station) -> Bool in
-          return station.coordinate != nil
-        })
-        .filter({
-          return $0.name != radioState?.stationName
-        })
-        .map({ station in
-          let marker = MKPointAnnotation()
-          marker.coordinate = station.coordinate!.CLCoordinate
-          marker.title = station.name
-          return marker
-        })
-      mapView.removeAnnotations(mapView.annotations)
-      mapView.addAnnotations(annotations)
-    }
-  }
 
+  // MARK: - UIViewController
   override var preferredStatusBarStyle: UIStatusBarStyle {
     return .lightContent
   }
 
+  // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
     mapView.delegate = self
   }
 
-  // MARK: - Lifecycle
   override func viewDidAppear(_ animated: Bool) {
+    // Reload stations every time this view is visited
+    fetchRadioStations()
+      .subscribe(onSuccess: self.updateMapPinsToStations,
+                 onError: self.showErrorAlert)
+      .disposed(by: disposeBag)
+  }
+
+  // MARK: -
+  private func fetchRadioStations() -> Single<[RadioStation]> {
     let req = URLRequest(url: URL(string: "http://192.168.0.99:3000/radio/stations")!)
-    URLSession.shared.rx.data(request: req)
+    return URLSession.shared.rx.data(request: req)
       .asSingle()
       .map({ data -> [RadioStation] in
         let decoder = JSONDecoder()
         return try decoder.decode([RadioStation].self, from: data)
       })
       .observeOn(MainScheduler.instance)
-      .subscribe(onSuccess: { [weak self] stations in
-        self?.radioStations = stations
-      }, onError: { [weak self] error in
-        self?.showErrorAlert(error: error.localizedDescription)
-      }).disposed(by: disposeBag)
   }
 
-  private func showErrorAlert(error: String) {
+  /// Creates pins for radio stations and populates the map view with them
+  private func updateMapPinsToStations(_ stations: [RadioStation]) {
+    let annotations: [MKPointAnnotation] = stations
+      .filter({
+        // Remove the current station
+        return $0.name != radioCoordinator.state.stationName
+      })
+      .compactMap({ station in
+        guard let coordinate = station.coordinate else { return nil }
+        let marker = MKPointAnnotation()
+        marker.coordinate = coordinate.CLCoordinate
+        marker.title = station.name
+        return marker
+      })
+    mapView.removeAnnotations(mapView.annotations)
+    mapView.addAnnotations(annotations)
+  }
+
+  /// Attempts to join the broadcast with the given name
+  private func joinBroadcast(stationName: String) {
+    let radioState = radioCoordinator.state
+    if radioState.isBroadcasting && radioState.stationName == stationName {
+      self.showErrorAlert(error: "You can't listen to your own station")
+    } else {
+      self.radioCoordinator.joinBroadcast(stationName: stationName)
+        .subscribe(onCompleted: {
+          // Go to first tab
+          self.tabBarController?.selectedIndex = 0
+        }, onError: { error in
+          self.showErrorAlert(error: error)
+        }).disposed(by: self.disposeBag)
+    }
+  }
+
+  /// Displays an error alert popup
+  private func showErrorAlert(error: Error) {
+    let msg = error as? String ?? error.localizedDescription
     let alert = UIAlertController(title: "Error",
-                                  message: error,
+                                  message: msg,
                                   preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "OK", style: .cancel) { alert in
       self.dismiss(animated: true)
@@ -81,6 +101,7 @@ class DiscoverViewController: UIViewController {
 
 // MARK: - MKMapViewDelegate
 extension DiscoverViewController: MKMapViewDelegate {
+  // Sets up popup view with play button for markers
   func mapView(_ mapView: MKMapView,
                viewFor annotation: MKAnnotation) -> MKAnnotationView? {
     if annotation is MKUserLocation { return nil }
@@ -98,31 +119,22 @@ extension DiscoverViewController: MKMapViewDelegate {
       let image = UIImage(named: "PlayCircle")
       let button = UIButton(type: .custom)
       button.setImage(image, for: .normal)
-      button.frame = CGRect(x: 0, y: 0, width: image!.size.width, height: image!.size.height)
+      button.frame = CGRect(x: 0, y: 0,
+                            width: image!.size.width, height: image!.size.height)
       view.rightCalloutAccessoryView = button
     }
     return view
   }
 
+  // Called when the play button of a station is tapped
   func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView,
                calloutAccessoryControlTapped control: UIControl) {
     guard case let station?? = view.annotation?.title else { return }
-    radioCoordinator.state
-      .take(1)
-      .subscribe(onNext: { [weak self] state in
-        guard let self = self else { return }
-        if state.isBroadcasting && state.stationName == station {
-          self.showErrorAlert(error: "You can't listen to your own station")
-        } else {
-          self.radioCoordinator.joinBroadcast(stationName: station)
-            .subscribe(onError: { error in
-              self.showErrorAlert(error: "Failed to join broadcast")
-            }).disposed(by: self.disposeBag)
-        }
-    }).disposed(by: disposeBag)
+    joinBroadcast(stationName: station)
   }
 }
 
+// MARK: - Coordinate+CLLocationCoordinate2D
 extension Coordinate {
   var CLCoordinate: CLLocationCoordinate2D {
     return CLLocationCoordinate2D(latitude: self.lat, longitude: self.lng)

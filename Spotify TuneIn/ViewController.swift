@@ -52,10 +52,21 @@ class ViewController: UIViewController {
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
     updateUI()
-    radioCoordinator.state.subscribe(onNext: { [weak self] state in
+    radioCoordinator.stateStream.subscribe(onNext: { [weak self] state in
       self?.state.radioState = state
+    }).disposed(by: disposeBag)
+    radioCoordinator.errorStream.subscribe(onNext: { error in
+      switch error {
+      case .apiDisconnected:
+        self.showErrorAlert(error: "The server disconnected")
+      case .apiError(let str):
+        self.showErrorAlert(error: str)
+      case .remoteDisconnected:
+        self.showErrorAlert(error: "Spotify disconnected")
+      case .remoteError(let str):
+        self.showErrorAlert(error: str)
+      }
     }).disposed(by: disposeBag)
   }
 
@@ -93,9 +104,11 @@ class ViewController: UIViewController {
     trackArtistLabel.text = state.playerState?.trackArtist
   }
 
-  private func showErrorAlert(error: String) {
+  /// Displays an error alert popup
+  private func showErrorAlert(error: Error) {
+    let msg = error as? String ?? error.localizedDescription
     let alert = UIAlertController(title: "Error",
-                                  message: error,
+                                  message: msg,
                                   preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "OK", style: .cancel) { alert in
       self.dismiss(animated: true)
@@ -127,12 +140,13 @@ class ViewController: UIViewController {
   }
 
   private func connectToSpotify() {
-    remote.connect().subscribe(onCompleted: { [weak self] in
-      self?.state.isConnected = true
-      self?.startMonitoringPlayerUpdates()
-      }, onError: { _ in
-        self.showErrorAlert(error: "Failed to connect to Spotify")
-    }).disposed(by: disposeBag)
+    remote.connect()
+      .subscribe(onCompleted: { [weak self] in
+        self?.state.isConnected = true
+        self?.startMonitoringPlayerUpdates()
+        }, onError: {
+          self.showErrorAlert(error: $0)
+      }).disposed(by: disposeBag)
   }
 
   private func startBroadcasting() {
@@ -155,31 +169,22 @@ class ViewController: UIViewController {
           .flatMapCompletable({ station in
             return self.radioCoordinator.startBroadcast(station: station)
           })
-          .subscribe(onError: { error in
-            if let str = error as? String {
-              self.showErrorAlert(error: str)
-            }
-          }).disposed(by: self.disposeBag)
+          .subscribe(onError: { self.showErrorAlert(error: $0) })
+          .disposed(by: self.disposeBag)
     }))
     self.present(alert, animated: true, completion: nil)
   }
 
   private func endBroadcasting() {
     radioCoordinator.endBroadcast()
-      .subscribe(onError: { error in
-        if let str = error as? String {
-          self.showErrorAlert(error: str)
-        }
-      }).disposed(by: disposeBag)
+      .subscribe(onError: { self.showErrorAlert(error: $0) })
+      .disposed(by: disposeBag)
   }
 
   private func leaveBroadcast() {
     radioCoordinator.leaveBroadcast()
-      .subscribe(onError: { error in
-        if let str = error as? String {
-          self.showErrorAlert(error: str)
-        }
-      }).disposed(by: disposeBag)
+      .subscribe(onError: { self.showErrorAlert(error: $0) })
+      .disposed(by: disposeBag)
   }
 
   @IBAction func actionButtonTapped(_ sender: Any) {

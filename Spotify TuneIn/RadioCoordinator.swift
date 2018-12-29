@@ -31,13 +31,11 @@ class RadioCoordinator {
   private let stateRelay = BehaviorRelay<State>(
     value: State(isBroadcasting: false, isListening: false, stationName: nil)
   )
-  var state: Observable<State> {
-    return stateRelay.asObservable()
-  }
+  var state: State { return stateRelay.value }
+  var stateStream: Observable<State> { return stateRelay.asObservable() }
+
   private let errorRelay = PublishRelay<UnexpectedError>()
-  var errors: Observable<UnexpectedError> {
-    return errorRelay.asObservable()
-  }
+  var errorStream: Observable<UnexpectedError> { return errorRelay.asObservable() }
 
   init(api: RadioAPIClient, remote: MusicRemote) {
     self.api = api
