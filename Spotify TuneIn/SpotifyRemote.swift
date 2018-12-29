@@ -143,8 +143,6 @@ class SpotifyRemote: NSObject, MusicRemote {
       guard let playerAPI = self.appRemote.playerAPI else {
         return Completable.error("Not connected to Spotify")
       }
-      let scrubPosition =
-        newState.playbackPosition + ((Int(CACurrentMediaTime() * 1000)) - newState.timestamp)
       if let currentState = self.currentState {
         if newState.isPaused {
           if currentState.isPaused {
@@ -155,15 +153,21 @@ class SpotifyRemote: NSObject, MusicRemote {
         } else {
           if currentState.isPaused {
             return self.play(trackURI: newState.trackURI, player: playerAPI)
-              .andThen(self.scrub(to: scrubPosition, player: playerAPI))
+              .delay(0.5, scheduler: MainScheduler.instance)
+              .andThen(Completable.deferred({
+                self.scrub(to: newState.syncedPlaybackPosition, player: playerAPI)
+              }))
           } else {
             if currentState.trackURI != newState.trackURI {
               // New track
               return self.play(trackURI: newState.trackURI, player: playerAPI)
-                .andThen(self.scrub(to: scrubPosition, player: playerAPI))
+                .delay(0.5, scheduler: MainScheduler.instance)
+                .andThen(Completable.deferred({
+                  self.scrub(to: newState.syncedPlaybackPosition, player: playerAPI)
+                }))
             } else {
               // Same track
-              return self.scrub(to: scrubPosition, player: playerAPI)
+              return self.scrub(to: newState.syncedPlaybackPosition, player: playerAPI)
             }
           }
         }
@@ -173,7 +177,10 @@ class SpotifyRemote: NSObject, MusicRemote {
           return self.pause(player: playerAPI)
         } else {
           return self.play(trackURI: newState.trackURI, player: playerAPI)
-            .andThen(self.scrub(to: scrubPosition, player: playerAPI))
+            .delay(0.5, scheduler: MainScheduler.instance)
+            .andThen(Completable.deferred({
+              self.scrub(to: newState.syncedPlaybackPosition, player: playerAPI)
+            }))
         }
       }
     })
@@ -272,11 +279,17 @@ extension SpotifyRemote: SPTAppRemotePlayerStateDelegate {
 // MARK: -
 extension SPTAppRemotePlayerState {
   var state: PlayerState {
-    return PlayerState(timestamp: Int(CACurrentMediaTime() * 1000),
+    return PlayerState(timestamp: Int(CFAbsoluteTimeGetCurrent() * 1000),
                        isPaused: self.isPaused,
                        trackName: self.track.name,
                        trackArtist: self.track.artist.name,
                        trackURI: self.track.uri,
                        playbackPosition: self.playbackPosition)
+  }
+}
+
+extension PlayerState {
+  var syncedPlaybackPosition: Int {
+    return self.playbackPosition + ((Int(CFAbsoluteTimeGetCurrent() * 1000)) - self.timestamp)
   }
 }

@@ -52,6 +52,7 @@ class ViewController: UIViewController {
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
+
     updateUI()
     radioCoordinator.stateStream.subscribe(onNext: { [weak self] state in
       self?.state.radioState = state
