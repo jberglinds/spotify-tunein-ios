@@ -151,7 +151,9 @@ class NowPlayingViewController: UIViewController {
 
   // MARK: - Actions
   private func connectToSpotify() {
+    self.actionButton.isEnabled = false
     remote.connect()
+      .do(onDispose: { self.actionButton.isEnabled = true })
       .subscribe(onError: {
         self.showErrorAlert(error: $0)
       }).disposed(by: disposeBag)
@@ -177,7 +179,9 @@ class NowPlayingViewController: UIViewController {
           .flatMapCompletable({ station in
             return self.radioCoordinator.startBroadcast(station: station)
           })
-          .subscribe(onError: { self.showErrorAlert(error: $0) })
+          .subscribe(onError: {
+            self.showErrorAlert(error: $0)
+          })
           .disposed(by: self.disposeBag)
     }))
     self.present(alert, animated: true, completion: nil)
