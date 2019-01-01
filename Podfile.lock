@@ -7,6 +7,8 @@ PODS:
     - RxSwift (~> 4.0)
   - RxSwift (4.4.0):
     - RxAtomic (~> 4.4)
+  - RxSwiftExt/Core (3.4.0):
+    - RxSwift (~> 4.0)
   - Socket.IO-Client-Swift (13.3.1):
     - Starscream (~> 3.0.2)
   - SpotifyRemoteSDK (1.0.1)
@@ -16,6 +18,7 @@ DEPENDENCIES:
   - RxBlocking (~> 4.0)
   - RxCocoa (~> 4.0)
   - RxSwift (~> 4.0)
+  - RxSwiftExt/Core
   - Socket.IO-Client-Swift (~> 13.3.0)
   - SpotifyRemoteSDK (~> 1.0)
 
@@ -25,6 +28,7 @@ SPEC REPOS:
     - RxBlocking
     - RxCocoa
     - RxSwift
+    - RxSwiftExt
     - Socket.IO-Client-Swift
     - SpotifyRemoteSDK
     - Starscream
@@ -34,10 +38,11 @@ SPEC CHECKSUMS:
   RxBlocking: 138ad53217434444d6eeeb4fb406a45431d92e31
   RxCocoa: df63ebf7b9a70d6b4eeea407ed5dd4efc8979749
   RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
+  RxSwiftExt: 01f8ecbeeb355698e9c75365ebe908b00dacf45d
   Socket.IO-Client-Swift: 79f8f85fa44881838175a20f9bd2c32bef2c9d37
   SpotifyRemoteSDK: 59c67b1a8ee08b532bd4caea457ae43cfad15d98
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
 
-PODFILE CHECKSUM: ca6ded493a98d02c2ac953b5866d48d5e3834638
+PODFILE CHECKSUM: 2fa69c1532428db13ffc5ee0737ee4bccdcaee0a
 
 COCOAPODS: 1.5.3

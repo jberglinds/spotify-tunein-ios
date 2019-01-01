@@ -8,9 +8,12 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 protocol MusicRemote {
+  var isConnected: Driver<Bool> { get }
+  var playerState: Driver<PlayerState?> { get }
+  var unexpectedErrors: Signal<Error> { get }
   func connect() -> Completable
-  func getPlayerUpdates() -> Observable<PlayerState>
   func updatePlayerToState(newState: PlayerState) -> Completable
 }

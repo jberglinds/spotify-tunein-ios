@@ -19,6 +19,7 @@ class DiscoverViewController: UIViewController {
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     return appDelegate.radioCoordinator
   }()
+  private var ownStationName: String?
   var disposeBag = DisposeBag()
 
   // MARK: - UIViewController
@@ -30,6 +31,12 @@ class DiscoverViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     mapView.delegate = self
+
+    radioCoordinator.state
+      .drive(onNext: { state in
+        self.ownStationName = state.isBroadcasting ? state.stationName : nil
+      })
+      .disposed(by: disposeBag)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -56,8 +63,7 @@ class DiscoverViewController: UIViewController {
   private func updateMapPinsToStations(_ stations: [RadioStation]) {
     let annotations: [MKPointAnnotation] = stations
       .filter({
-        // Remove the current station
-        return $0.name != radioCoordinator.state.stationName
+        return $0.name != ownStationName
       })
       .compactMap({ station in
         guard let coordinate = station.coordinate else { return nil }
@@ -72,8 +78,7 @@ class DiscoverViewController: UIViewController {
 
   /// Attempts to join the broadcast with the given name
   private func joinBroadcast(stationName: String) {
-    let radioState = radioCoordinator.state
-    if radioState.isBroadcasting && radioState.stationName == stationName {
+    if ownStationName == stationName {
       self.showErrorAlert(error: "You can't listen to your own station")
     } else {
       self.radioCoordinator.joinBroadcast(stationName: stationName)

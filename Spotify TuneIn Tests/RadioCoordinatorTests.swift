@@ -59,7 +59,7 @@ class RadioCoordinatorTests: XCTestCase {
   }
 
   func failOnError() {
-    coordinator.errors.subscribe({ _ in
+    coordinator.errors.emit(onNext: { _ in
       XCTFail()
     }).disposed(by: disposeBag)
   }
@@ -130,12 +130,12 @@ class RadioCoordinatorTests: XCTestCase {
     XCTAssertEqual(
       socket.emittedEvents,
       [RadioAPIClient.OutgoingEvent.joinBroadcast,
-       RadioAPIClient.OutgoingEvent.startBroadcast].map({ $0.rawValue })
+       RadioAPIClient.OutgoingEvent.startBroadcast,
+       RadioAPIClient.OutgoingEvent.updatePlayerState].map({ $0.rawValue })
     )
   }
 
   func testBroadcastWhenDisconnectedFromApi () {
-    failOnError()
     socket.disconnectWithError()
     XCTAssertThrowsError(try startBroadcast())
   }
@@ -147,7 +147,6 @@ class RadioCoordinatorTests: XCTestCase {
   }
 
   func testTuneInWhenDisconnectedFromApi () {
-    failOnError()
     socket.disconnectWithError()
     XCTAssertThrowsError(try joinBroadcast())
   }
@@ -161,7 +160,7 @@ class RadioCoordinatorTests: XCTestCase {
   func testApiDisconnectWhileBroadcasting() throws {
     try startBroadcast()
     let async = XCTestExpectation()
-    coordinator.errors.subscribe(onNext: { error in
+    coordinator.errors.emit(onNext: { error in
       if case .apiDisconnected = error {}
       else { XCTFail() }
       async.fulfill()
@@ -173,7 +172,7 @@ class RadioCoordinatorTests: XCTestCase {
   func testRemoteDisconnectWhileBroadcasting() throws {
     try startBroadcast()
     let async = XCTestExpectation()
-    coordinator.errors.subscribe(onNext: { error in
+    coordinator.errors.emit(onNext: { error in
       if case .remoteDisconnected = error {}
       else { XCTFail() }
       async.fulfill()
@@ -185,7 +184,7 @@ class RadioCoordinatorTests: XCTestCase {
   func testApiDisconnectWhileTunedIn() throws {
     try joinBroadcast()
     let async = XCTestExpectation()
-    coordinator.errors.subscribe(onNext: { error in
+    coordinator.errors.emit(onNext: { error in
       if case .apiDisconnected = error {}
       else { XCTFail() }
       async.fulfill()
@@ -197,7 +196,7 @@ class RadioCoordinatorTests: XCTestCase {
   func testRemoteDisconnectWhileTunedIn() throws {
     try joinBroadcast()
     let async = XCTestExpectation()
-    coordinator.errors.subscribe(onNext: { error in
+    coordinator.errors.emit(onNext: { error in
       if case .remoteDisconnected = error {}
       else { XCTFail() }
       async.fulfill()

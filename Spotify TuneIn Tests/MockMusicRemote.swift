@@ -11,28 +11,33 @@ import RxSwift
 import RxCocoa
 
 class MockMusicRemote: MusicRemote {
-  var playerStateUpdates = [PlayerState]()
+  let isConnectedRelay = BehaviorRelay<Bool>(value: false)
+  let playerStateRelay = BehaviorRelay<PlayerState?>(value: nil)
+  let errorRelay = PublishRelay<Error>()
+
+  var isConnected: Driver<Bool> { return isConnectedRelay.asDriver() }
+  var playerState: Driver<PlayerState?> { return playerStateRelay.asDriver() }
+  var unexpectedErrors: Signal<Error> { return errorRelay.asSignal() }
 
   var allowConnect = true
-  var connected = false
-
-  private var playerUpdatesRelay = PublishRelay<Event<PlayerState>>()
+  var playerStateUpdates = [PlayerState]()
 
   func mockDisconnect() {
-    connected = false
-    playerUpdatesRelay.accept(.error("Player disconnected"))
+    isConnectedRelay.accept(false)
+    playerStateRelay.accept(nil)
+    errorRelay.accept("Disconnected")
   }
 
   func mockPlayerUpdateEvent(playerState: PlayerState) {
-    if connected {
-      playerUpdatesRelay.accept(.next(playerState))
+    if isConnectedRelay.value {
+      playerStateRelay.accept(playerState)
     }
   }
 
   func connect() -> Completable {
     return Completable.create(subscribe: { [weak self] src in
       if self?.allowConnect ?? false {
-        self?.connected = true
+        self?.isConnectedRelay.accept(true)
         src(.completed)
       } else {
         src(.error("Error connecting"))
@@ -41,19 +46,11 @@ class MockMusicRemote: MusicRemote {
     })
   }
 
-  func getPlayerUpdates() -> Observable<PlayerState> {
-    return Observable.deferred({ [weak self] in
-      guard let self = self else { return Observable.empty() }
-      return self.connected
-        ? self.playerUpdatesRelay.dematerialize().asObservable()
-        : Observable.error("Not connected to remote")
-    })
-  }
-
   func updatePlayerToState(newState: PlayerState) -> Completable {
     return Completable.create(subscribe: { [weak self] src in
-      if self?.connected ?? false {
+      if self?.isConnectedRelay.value ?? false {
         self?.playerStateUpdates.append(newState)
+        self?.playerStateRelay.accept(newState)
         src(.completed)
       } else {
         src(.error("Not connected to remote"))

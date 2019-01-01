@@ -8,6 +8,7 @@ target 'Spotify TuneIn' do
   pod 'RxSwift', '~> 4.0'
   pod 'RxBlocking', '~> 4.0'
   pod 'RxCocoa', '~> 4.0'
+  pod 'RxSwiftExt/Core'
   pod 'Socket.IO-Client-Swift', '~> 13.3.0'
 
   target 'Spotify TuneIn Tests' do

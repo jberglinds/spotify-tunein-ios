@@ -107,24 +107,13 @@ class RadioAPIClientTests: XCTestCase {
   }
 
   // MARK: - getBroadcasterEvents
-  func testGetBroadcasterEventsWhenNotBroadcastingFails() throws {
-    XCTAssert(apiClient.isBroadcasting == false)
-    XCTAssertThrowsError(
-      try apiClient.getBroadcasterEvents()
-        .toBlocking(timeout: 1.0)
-        .last()) { error in
-          // Assure not timeout error
-          XCTAssertNil(error as? RxError)
-    }
-  }
-
   func testGetBroadcasterEventsWhenBroadcasting() throws {
     try startBroadcasting()
     XCTAssert(apiClient.isBroadcasting == true)
 
     let async = XCTestExpectation()
-    apiClient.getBroadcasterEvents()
-      .subscribe(onNext: { _ in
+    apiClient.broadcasterEvents
+      .emit(onNext: { _ in
         async.fulfill()
       }).disposed(by: disposeBag)
     // Send event which should appear in subscribe
@@ -132,33 +121,6 @@ class RadioAPIClientTests: XCTestCase {
       RadioAPIClient.IncomingEvent.listenerCountChanged.rawValue,
       data: 1
     )
-    wait(for: [async], timeout: 1.0)
-  }
-
-  func testGetBroadcasterEventsCompletesWhenBroadcastEnds() throws {
-    try startBroadcasting()
-    XCTAssert(apiClient.isBroadcasting == true)
-
-    let async = XCTestExpectation()
-    apiClient.getBroadcasterEvents()
-      .subscribe(onCompleted: {
-        async.fulfill()
-      }).disposed(by: disposeBag)
-    try endBroadcasting()
-    wait(for: [async], timeout: 1.0)
-  }
-
-  func testGetBroadcasterEventsErrorsOnDisconnect() throws {
-    try startBroadcasting()
-    XCTAssert(apiClient.isBroadcasting == true)
-
-    let async = XCTestExpectation()
-    apiClient.getBroadcasterEvents()
-      .subscribe(onError: { error in
-        XCTAssertNil(error as? RxError)
-        async.fulfill()
-      }).disposed(by: disposeBag)
-    socketProvider.disconnectWithError()
     wait(for: [async], timeout: 1.0)
   }
 
@@ -229,24 +191,13 @@ class RadioAPIClientTests: XCTestCase {
   }
 
   // MARK: - getListenerEvents
-  func testGetListenerEventsWhenNotListeningFails() throws {
-    XCTAssert(apiClient.isListening == false)
-    XCTAssertThrowsError(
-      try apiClient.getListenerEvents()
-        .toBlocking(timeout: 1.0)
-        .last()) { error in
-          // Assure not timeout error
-          XCTAssertNil(error as? RxError)
-    }
-  }
-
   func testGetListenerEventsWhenListening() throws {
     try joinBroadcast()
     XCTAssert(apiClient.isListening == true)
 
     let async = XCTestExpectation()
-    apiClient.getListenerEvents()
-      .subscribe(onNext: { _ in
+    apiClient.listenerEvents
+      .emit(onNext: { _ in
         async.fulfill()
       }).disposed(by: disposeBag)
     // Send event which should appear in subscribe
@@ -256,46 +207,13 @@ class RadioAPIClientTests: XCTestCase {
     )
     wait(for: [async], timeout: 1.0)
   }
+}
 
-  func testGetListenerEventsCompletesWhenLeavingBroadcast() throws {
-    try joinBroadcast()
-    XCTAssert(apiClient.isListening == true)
-
-    let async = XCTestExpectation()
-    apiClient.getListenerEvents()
-      .subscribe(onCompleted: {
-        async.fulfill()
-      }).disposed(by: disposeBag)
-    try leaveBroadcast()
-    wait(for: [async], timeout: 1.0)
+private extension RadioAPIClient {
+  var isBroadcasting: Bool {
+    return try! state.toBlocking().first()!.isBroadcasting
   }
-
-  func testGetListenerEventsErrorsOnDisconnect() throws {
-    try joinBroadcast()
-    XCTAssert(apiClient.isListening == true)
-
-    let async = XCTestExpectation()
-    apiClient.getListenerEvents()
-      .subscribe(onError: { error in
-        XCTAssertNil(error as? RxError)
-        async.fulfill()
-      }).disposed(by: disposeBag)
-    socketProvider.disconnectWithError()
-    wait(for: [async], timeout: 1.0)
-  }
-
-  func testGetListenerEventsCompletesWhenBroadcastEnds() throws {
-    try joinBroadcast()
-    XCTAssert(apiClient.isListening == true)
-
-    let async = XCTestExpectation()
-    apiClient.getListenerEvents()
-      .subscribe(onCompleted: {
-        async.fulfill()
-      }).disposed(by: disposeBag)
-    socketProvider.mockIncomingEvent(RadioAPIClient.IncomingEvent.broadcastEnded.rawValue)
-
-    XCTAssert(apiClient.isListening == false)
-    wait(for: [async], timeout: 1.0)
+  var isListening: Bool {
+    return try! state.toBlocking().first()!.isListenening
   }
 }

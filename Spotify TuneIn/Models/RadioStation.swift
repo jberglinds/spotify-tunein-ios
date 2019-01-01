@@ -8,12 +8,7 @@
 
 import Foundation
 
-class RadioStation: NSObject, Codable {
-  init(name: String, coordinate: Coordinate?) {
-    self.name = name
-    self.coordinate = coordinate
-  }
-
+struct RadioStation: Codable {
   var name: String
   var coordinate: Coordinate?
 }

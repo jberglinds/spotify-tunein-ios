@@ -12,6 +12,7 @@ import RxSwift
 import RxCocoa
 
 class RadioAPIClient {
+  // MARK: - Models
   enum IncomingEvent: String {
     case playerStateUpdated = "player-state-updated"
     case broadcastEnded = "broadcast-ended"
@@ -28,20 +29,37 @@ class RadioAPIClient {
 
   enum ListenerEvent {
     case playerStateChanged(PlayerState)
+    case broadcastEnded
   }
 
   enum BroadcasterEvent {
     case listenerCountChanged(newCount: Int)
   }
 
+  struct State {
+    var isBroadcasting = false
+    var isListenening = false
+  }
+
+  enum UnexpectedError {
+    case disconnected
+  }
+
+  // MARK: - Properties
   private var socket: SocketProvider
+  private var broadcasterRelay = PublishRelay<BroadcasterEvent>()
+  private var listenerRelay = PublishRelay<ListenerEvent>()
+  private var stateRelay = BehaviorRelay<State>(
+    value: State(isBroadcasting: false, isListenening: false)
+  )
+  private var errorRelay = PublishRelay<UnexpectedError>()
 
-  private var broadcasterRelay = PublishRelay<Event<BroadcasterEvent>>()
-  private var listenerRelay = PublishRelay<Event<ListenerEvent>>()
+  var broadcasterEvents: Signal<BroadcasterEvent> { return broadcasterRelay.asSignal() }
+  var listenerEvents: Signal<ListenerEvent> { return listenerRelay.asSignal() }
+  var state: Driver<State> { return stateRelay.asDriver() }
+  var errors: Signal<UnexpectedError> { return errorRelay.asSignal() }
 
-  private(set) var isBroadcasting = false
-  private(set) var isListening = false
-
+  // MARK: - Initialization
   init(socket: SocketProvider) {
     self.socket = socket
 
@@ -49,101 +67,93 @@ class RadioAPIClient {
       print("Socket connected")
     }
 
-    socket.on(clientEvent: .error) { [weak self] _, _ in
-      self?.handleDisconnect()
+    socket.on(clientEvent: .error) { _, _ in
+      self.errorRelay.accept(.disconnected)
+      self.stateRelay.accept(
+        State(isBroadcasting: false, isListenening: false)
+      )
     }
 
-    socket.on(clientEvent: .disconnect) { [weak self] _, _ in
-      self?.handleDisconnect()
+    socket.on(clientEvent: .disconnect) {  _, _ in
+      self.errorRelay.accept(.disconnected)
+      self.stateRelay.accept(
+        State(isBroadcasting: false, isListenening: false)
+      )
     }
 
-    socket.on(IncomingEvent.broadcastEnded.rawValue) { [weak self] data, _ in
-      self?.listenerRelay.accept(.completed)
-      self?.isListening = false
+    socket.on(IncomingEvent.broadcastEnded.rawValue) { data, _ in
+      self.listenerRelay.accept(.broadcastEnded)
+      self.stateRelay.accept(
+        State(isBroadcasting: false, isListenening: false)
+      )
     }
 
-    socket.on(IncomingEvent.playerStateUpdated.rawValue) { [weak self] data, _ in
+    socket.on(IncomingEvent.playerStateUpdated.rawValue) { data, _ in
       guard let first = data.first  else { return }
       guard let state = PlayerState(from: first) else { return }
-      self?.listenerRelay.accept(.next(.playerStateChanged(state)))
+      self.listenerRelay.accept(.playerStateChanged(state))
     }
 
-    socket.on(IncomingEvent.listenerCountChanged.rawValue) { [weak self] data, _ in
-      self?.broadcasterRelay.accept(.next(.listenerCountChanged(newCount: 1)))
+    socket.on(IncomingEvent.listenerCountChanged.rawValue) { data, _ in
+      self.broadcasterRelay.accept(.listenerCountChanged(newCount: 1))
     }
 
     socket.connect()
   }
 
-  private func handleDisconnect() {
-    self.isBroadcasting = false
-    self.isListening = false
-    self.listenerRelay.accept(.error("Lost connection to server"))
-    self.broadcasterRelay.accept(.error("Lost connection to server"))
-  }
-
+  // MARK: - API Actions
   func startBroadcasting(station: RadioStation) -> Completable {
     return socket
       .emitWithVoidAck(event: .startBroadcast, data: station.socketRepresentation())
       .do(onCompleted: { [weak self] in
-        self?.isBroadcasting = true
-        self?.isListening = false
+        self?.stateRelay.accept(
+          State(isBroadcasting: true, isListenening: false)
+        )
       })
-  }
-
-  func getBroadcasterEvents() -> Observable<BroadcasterEvent> {
-    return Observable.deferred({ [weak self] in
-      guard let self = self else { return Observable.empty() }
-      return self.isBroadcasting
-        ? self.broadcasterRelay.dematerialize().asObservable()
-        : Observable.error("Not currently broadcasting")
-    })
   }
 
   func endBroadcasting() -> Completable {
     return socket.emitWithVoidAck(event: .endBroadcast)
       .do(onCompleted: { [weak self] in
-        self?.isBroadcasting = false
-        self?.broadcasterRelay.accept(.completed)
+        self?.stateRelay.accept(
+          State(isBroadcasting: false, isListenening: false)
+        )
       })
   }
 
-  func joinBroadcast(stationName: String) -> Single<PlayerState> {
+  func joinBroadcast(stationName: String) -> Completable {
     return socket
       .emitWithAck(event: .joinBroadcast, data: stationName)
-      .map({ value in
+      .do(onSuccess: { [weak self] state in
+        self?.stateRelay.accept(
+          State(isBroadcasting: false, isListenening: true)
+        )
+      })
+      .map({ value throws -> PlayerState in
         if let state = PlayerState(from: value) {
           return state
         } else {
           throw "Invalid payload"
         }
       })
-      .do(onSuccess: { [weak self] _ in
-        self?.isBroadcasting = false
-        self?.isListening = true
+      .do(onSuccess: { state in
+        self.listenerRelay.accept(.playerStateChanged(state))
       })
-  }
-
-  func getListenerEvents() -> Observable<ListenerEvent> {
-    return Observable.deferred({ [weak self] in
-      guard let self = self else { return Observable.empty() }
-      return self.isListening
-        ? self.listenerRelay.dematerialize().asObservable()
-        : Observable.error("Not currently listening")
-    })
+      .asCompletable()
   }
 
   func leaveBroadcast() -> Completable {
     return socket.emitWithVoidAck(event: .leaveBroadcast)
       .do(onCompleted: { [weak self] in
-        self?.isListening = false
-        self?.listenerRelay.accept(.completed)
+        self?.stateRelay.accept(
+          State(isBroadcasting: false, isListenening: false)
+        )
       })
   }
 
   func broadcastPlayerStateChange(newState: PlayerState) -> Completable {
     return Completable.create(subscribe: { [weak self] src in
-      if self?.isBroadcasting ?? false {
+      if self?.stateRelay.value.isBroadcasting ?? false {
         src(.completed)
       } else {
         src(.error("Not currently broadcasting"))
@@ -156,7 +166,8 @@ class RadioAPIClient {
   }
 }
 
-extension SocketProvider {
+// MARK: - Private Extensions
+private extension SocketProvider {
   func emitWithVoidAck(event: RadioAPIClient.OutgoingEvent, data: SocketData...)
     -> Completable {
       let maybe = emitWithAck(event: event, data: data)
@@ -192,7 +203,7 @@ extension SocketProvider {
   }
 }
 
-extension PlayerState: SocketData {
+extension PlayerState {
   init?(from: Any) {
     guard
       let dict = from as? [String: Any],
@@ -219,7 +230,7 @@ extension PlayerState: SocketData {
   }
 }
 
-extension RadioStation: SocketData {
+private extension RadioStation {
   func socketRepresentation() -> SocketData {
     var data: [String: Any] = [
       "name": self.name

@@ -15,11 +15,12 @@ class BackgroundManager {
   static let shared = BackgroundManager()
   private init() {}
 
+  /// Start playing silence if not already doing that. Keeps us alive in background
   func playSilence() {
     // Bail out if unit test
     guard ProcessInfo.processInfo.environment["XCInjectBundleInto"] == nil else { return }
 
-    guard let url = Bundle.main.url(forResource: "silence", withExtension: "mp3") else {
+    guard let silence = NSDataAsset(name: "Silence") else {
       return
     }
 
@@ -28,7 +29,7 @@ class BackgroundManager {
         .setCategory(.playback, mode: .default, options: .mixWithOthers)
       try AVAudioSession.sharedInstance().setActive(true)
 
-      player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+      player = try AVAudioPlayer(data: silence.data, fileTypeHint: "mp3")
 
       guard let player = player else { return }
       if !player.isPlaying {
