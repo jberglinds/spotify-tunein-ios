@@ -49,7 +49,7 @@ class DiscoverViewController: UIViewController {
 
   // MARK: -
   private func fetchRadioStations() -> Single<[RadioStation]> {
-    let req = URLRequest(url: URL(string: "http://192.168.0.99:3000/radio/stations")!)
+    let req = URLRequest(url: URL(string: "http://spotify-tunein.herokuapp.com/radio/stations")!)
     return URLSession.shared.rx.data(request: req)
       .asSingle()
       .map({ data -> [RadioStation] in

@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   lazy var spotifyRemote = SpotifyRemote()
   lazy var radioCoordinator: RadioCoordinator = {
-    let socket = SocketIOProvider(url: "http://192.168.0.99:3000", namespace: "/radio")
+    let socket = SocketIOProvider(url: "http://spotify-tunein.herokuapp.com", namespace: "/radio")
     let api = RadioAPIClient(socket: socket)
     return RadioCoordinator(api: api, remote: spotifyRemote)
   }()
