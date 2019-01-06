@@ -21,6 +21,10 @@ pod install
 open Spotify\ TuneIn.xcworkspace/
 ```
 
+## Screenshots
+| ![img_1304](https://user-images.githubusercontent.com/6368728/50741407-0fbdb600-11fd-11e9-9c52-3d6acb1cd96d.png)  | ![img_1305](https://user-images.githubusercontent.com/6368728/50741406-0e8c8900-11fd-11e9-946c-ebc0511b6cd6.png) |
+|---|---|
+
 ## Built with
 - [Spotify iOS SDK](https://github.com/spotify/ios-sdk)
 - [Socket.IO](https://github.com/socketio/socket.io-client-swift)
